@@ -9,7 +9,7 @@ function App() {
         <h1>Daoxin</h1>
       </header>
       <main role='main'>
-          <DaoXinGraph />
+          <DaoXinGraph gauge={1} />
       </main>
       <footer></footer>
     </div>
