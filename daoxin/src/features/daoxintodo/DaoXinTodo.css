@@ -1,0 +1,11 @@
+.todo-container {
+  display: block;
+  margin: 0 auto;
+  margin-top: 24px;
+}
+
+.todo-container ul {
+  margin: 0 auto;
+  padding: 0;
+  list-style: none;
+}
