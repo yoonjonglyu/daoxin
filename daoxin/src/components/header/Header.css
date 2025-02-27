@@ -1,0 +1,17 @@
+.app-header {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: auto;
+  padding: 8px;
+  border-bottom: 1px solid rgb(189, 188, 188);
+}
+.app-header nav {
+  position: absolute;
+}
+.app-header h1 {
+  margin: 0 auto;
+  font-size: 1rem;
+  line-height: 1rem;
+}
