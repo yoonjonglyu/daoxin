@@ -9,6 +9,10 @@
 }
 .app-header nav {
   position: absolute;
+  cursor: pointer;
+}
+.app-header nav:hover {
+  text-shadow: 0.5px 0.5px rgb(219, 218, 218);
 }
 .app-header h1 {
   margin: 0 auto;
