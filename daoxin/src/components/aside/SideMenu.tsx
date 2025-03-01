@@ -2,11 +2,13 @@ import React from 'react';
 
 import './SideMenu.css';
 
-export interface SideMenuProps {}
+export interface SideMenuProps {
+  isAvail: boolean;
+}
 
-const SideMenu: React.FC<SideMenuProps> = () => {
+const SideMenu: React.FC<SideMenuProps> = ({ isAvail }) => {
   return (
-    <aside className='sidemenu-container'>
+    <aside className={`sidemenu-container ${isAvail ? 'active' : ''}`}>
       <ul>
         <li>About</li>
         <li>
