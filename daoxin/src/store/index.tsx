@@ -1,12 +1,12 @@
 import React from 'react';
-import { RecoilRoot } from 'recoil';
+import { Provider } from 'jotai';
 
 export interface StoreProviderProps {
   children: React.ReactNode;
 }
 
 const StoreProvider: React.FC<StoreProviderProps> = ({ children }) => {
-  return <RecoilRoot>{children}</RecoilRoot>;
+  return <Provider>{children}</Provider>;
 };
 
 export default StoreProvider;

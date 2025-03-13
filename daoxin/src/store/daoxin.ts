@@ -1,4 +1,4 @@
-import { atom, selector } from 'recoil';
+import { atom, PrimitiveAtom } from 'jotai';
 
 export interface DaoXinProps {
   list: Array<DaoXinListProps>;
@@ -14,22 +14,16 @@ export type DaoXinListProps = {
 };
 
 export const DaoXin = atom<DaoXinProps>({
-  key: 'daoxin',
-  default: {
-    gauge: 1,
-    list: [],
-    updateAt: '',
-  },
+  gauge: 1,
+  list: [],
+  updateAt: '',
 });
 
-export const DailyList = selector({
-  key: 'dailylist',
-  get: ({ get }) => {
-    return get(DaoXin).list;
-  },
-  set: ({ get, set }, value) => {
+export const DailyList = atom(
+  (get) => get(DaoXin).list,
+  (get, set, value) => {
     const prev = get(DaoXin);
     prev.list = value as Array<DaoXinListProps>;
     set(DaoXin, prev);
   },
-});
+);
