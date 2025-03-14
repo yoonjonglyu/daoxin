@@ -5,67 +5,122 @@ import { DaoXin, DailyList, DaoXinProps } from '../store/daoxin';
 
 const DAOXIN = 'daoxin';
 const SALT = '일체유심조';
+const MIN_GAUGE = 1;
+const MAX_GAUGE = 77;
+const TODAY = new Date().toISOString().split('T')[0];
 
 const useDaoxin = () => {
   const [dao, setDao] = useAtom(DaoXin);
   const [dList, setDList] = useAtom(DailyList);
 
-  const _saveData = async (value: any) =>
-    localStorage.setItem(
-      DAOXIN,
-      JSON.stringify(await encryptData(JSON.stringify(value), SALT, SALT)),
-    );
-
-  const initDaoxin = async () => {
-    const state = localStorage.getItem(DAOXIN);
-    if (state === null) {
-      const defaultValue: DaoXinProps = {
-        gauge: 1,
-        list: [
-          {
-            idx: 0,
-            todo: '참장공',
-            completed: false,
-            updateAt: new Date().toLocaleDateString(),
-          },
-          {
-            idx: 1,
-            todo: '명상',
-            completed: false,
-            updateAt: new Date().toLocaleDateString(),
-          },
-          {
-            idx: 2,
-            todo: '운동',
-            completed: false,
-            updateAt: new Date().toLocaleDateString(),
-          },
-        ],
-        updateAt: new Date().toLocaleDateString(),
-      };
-      _saveData(defaultValue);
-      setDao(defaultValue);
-    } else {
-      const encrypt = JSON.parse(state) as encryptedDataProps;
-      const prevState = await decryptData(
-        encrypt.encryptedData,
-        encrypt.iv,
+  const _saveData = async (value: DaoXinProps) => {
+    try {
+      const encryptedValue = await encryptData(
+        JSON.stringify(value),
         SALT,
         SALT,
       );
-      // 시간이 지난 것에 따라서 updateAt를 갱신하고 수행하지 못한 과제가 있을시 하루당 1씩 gauge를 감소시킨다.
-      setDao(JSON.parse(prevState));
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem(DAOXIN, JSON.stringify(encryptedValue));
+      } else {
+        console.error('localStorage is not supported in this environment.');
+      }
+    } catch (error) {
+      console.error('데이터 저장 중 오류 발생:', error);
     }
   };
 
-  const checkList = (idx: number) => {
-    // completed를 reduce로 받아서 모든 목록이 끝나면 gauge를 1증가시킨다.
-    // list를 중간에 추가할시 관련해서 처리할 로직은 조금 고민해봐야함.
-    const state = dList.map((i: any, _i: number) =>
-      idx === _i ? { ...i, completed: true } : i,
+  const _getDaysDifference = (prevDate: string, currentDate: string) => {
+    const prev = new Date(prevDate);
+    const curr = new Date(currentDate);
+    prev.setHours(0, 0, 0, 0); // 시간을 00:00:00으로 설정
+    curr.setHours(0, 0, 0, 0); // 시간을 00:00:00으로 설정
+    const diffTime = curr.getTime() - prev.getTime();
+    return Math.floor(diffTime / (1000 * 60 * 60 * 24)); // 밀리초 -> 일(day) 변환
+  };
+
+  const initDaoxin = async () => {
+    const storedData = localStorage.getItem(DAOXIN);
+
+    if (!storedData) {
+      const defaultValue: DaoXinProps = {
+        gauge: 1,
+        list: [
+          { idx: 0, todo: '참장공', completed: false, updateAt: TODAY },
+          { idx: 1, todo: '명상', completed: false, updateAt: TODAY },
+          { idx: 2, todo: '운동', completed: false, updateAt: TODAY },
+        ],
+        updateAt: TODAY,
+      };
+      await _saveData(defaultValue);
+      setDao(defaultValue);
+      return;
+    }
+
+    const encrypted = JSON.parse(storedData) as encryptedDataProps;
+    const decryptedState = await decryptData(
+      encrypted.encryptedData,
+      encrypted.iv,
+      SALT,
+      SALT,
     );
-    _saveData({ ...dao, list: state });
-    setDList(state);
+    const prevState: DaoXinProps = JSON.parse(decryptedState);
+
+    const daysPassed = _getDaysDifference(prevState.updateAt, TODAY);
+
+    if (daysPassed > 0) {
+      const allTasksCompleted = prevState.list.every((task) => task.completed);
+      if (allTasksCompleted)
+        prevState.gauge = Math.min(MAX_GAUGE, prevState.gauge + 1);
+      // 일괄적으로 지나간 일자만큼 gague를 감소시킨다.
+      prevState.gauge = Math.max(MIN_GAUGE, prevState.gauge - daysPassed);
+      // list 초기화 (completed: false, updateAt: today)
+      prevState.list = prevState.list.map((task) => ({
+        ...task,
+        completed: false,
+        updateAt: TODAY,
+      }));
+
+      prevState.updateAt = TODAY;
+    }
+
+    await _saveData(prevState);
+    setDao(prevState);
+    setDList(prevState.list);
+  };
+
+  const checkList = async (idx: number) => {
+    const { updatedList, allCompleted } = dList.reduce(
+      (result, item, i) => {
+        // list check.
+        result.updatedList.push(
+          i === idx
+            ? {
+                ...item,
+                completed: true,
+              }
+            : item,
+        );
+        // allCompleted check.
+        if (!item.completed) result.allCompleted = false;
+        return result;
+      },
+      { updatedList: [] as typeof dList, allCompleted: true },
+    );
+
+    const updatedDao = {
+      ...dao,
+      list: updatedList,
+    };
+
+    if (allCompleted) {
+      updatedDao.updateAt = TODAY; // YYYY-MM-DD
+      updatedDao.gauge = Math.min(MAX_GAUGE, dao.gauge + 1);
+    }
+
+    await _saveData(updatedDao);
+    setDList(updatedList);
+    setDao(updatedDao);
   };
 
   return { dao, dList, initDaoxin, checkList };
