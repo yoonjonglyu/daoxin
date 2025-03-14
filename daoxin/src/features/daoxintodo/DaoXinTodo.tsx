@@ -19,6 +19,7 @@ const DaoXinTodo: React.FC<DaoXinTodoProps> = () => {
                   type='checkbox'
                   checked={item.completed}
                   onChange={() => checkList(item.idx)}
+                  disabled={item.completed}
                 />
               </label>
               <span>{item.todo}</span>
