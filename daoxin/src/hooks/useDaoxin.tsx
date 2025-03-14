@@ -102,7 +102,7 @@ const useDaoxin = () => {
             : item,
         );
         // allCompleted check.
-        if (!item.completed) result.allCompleted = false;
+        if (i !== idx && !item.completed) result.allCompleted = false;
         return result;
       },
       { updatedList: [] as typeof dList, allCompleted: true },
