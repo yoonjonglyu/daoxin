@@ -1,25 +1,27 @@
 import React from 'react';
-
 import './DaoXinTodo.css';
 
-/**
- * 상태를 굳이 props 할 이유가 없긴하다
- */
+import useDaoxin from '../../hooks/useDaoxin';
 
-export interface DaoXinTodoProps {
-}
+export interface DaoXinTodoProps {}
 
 const DaoXinTodo: React.FC<DaoXinTodoProps> = () => {
+  const { dList, checkList } = useDaoxin();
+
   return (
     <div className='todo-container'>
       <ul>
-        {[0].map((item) => {
+        {dList.map((item) => {
           return (
-            <li>
+            <li key={item.idx}>
               <label>
-                <input type='checkbox' />
+                <input
+                  type='checkbox'
+                  defaultChecked={item.completed}
+                  onClick={() => checkList(item.idx)}
+                />
               </label>
-              <span>참장공</span>
+              <span>{item.todo}</span>
             </li>
           );
         })}
