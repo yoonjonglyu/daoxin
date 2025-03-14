@@ -1,4 +1,4 @@
-import { atom, PrimitiveAtom } from 'jotai';
+import { atom } from 'jotai';
 
 export interface DaoXinProps {
   list: Array<DaoXinListProps>;
