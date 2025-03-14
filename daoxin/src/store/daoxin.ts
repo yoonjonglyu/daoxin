@@ -21,9 +21,7 @@ export const DaoXin = atom<DaoXinProps>({
 
 export const DailyList = atom(
   (get) => get(DaoXin).list,
-  (get, set, value) => {
-    const prev = get(DaoXin);
-    prev.list = value as Array<DaoXinListProps>;
-    set(DaoXin, prev);
+  (get, set, value: DaoXinListProps[]) => {
+    set(DaoXin, { ...get(DaoXin), list: value });
   },
 );
