@@ -10,6 +10,12 @@ const useDaoxin = () => {
   const [dao, setDao] = useAtom(DaoXin);
   const [dList, setDList] = useAtom(DailyList);
 
+  const _saveData = async (value: any) =>
+    localStorage.setItem(
+      DAOXIN,
+      JSON.stringify(await encryptData(JSON.stringify(value), SALT, SALT)),
+    );
+
   const initDaoxin = async () => {
     const state = localStorage.getItem(DAOXIN);
     if (state === null) {
@@ -37,12 +43,7 @@ const useDaoxin = () => {
         ],
         updateAt: new Date().toLocaleDateString(),
       };
-      localStorage.setItem(
-        DAOXIN,
-        JSON.stringify(
-          await encryptData(JSON.stringify(defaultValue), SALT, SALT),
-        ),
-      );
+      _saveData(defaultValue);
       setDao(defaultValue);
     } else {
       const encrypt = JSON.parse(state) as encryptedDataProps;
@@ -60,11 +61,11 @@ const useDaoxin = () => {
   const checkList = (idx: number) => {
     // completed를 reduce로 받아서 모든 목록이 끝나면 gauge를 1증가시킨다.
     // list를 중간에 추가할시 관련해서 처리할 로직은 조금 고민해봐야함.
-    setDList((prev: any[]) =>
-      prev.map((i: any, _i: number) =>
-        idx === _i ? { ...i, completed: true } : i,
-      ),
+    const state = dList.map((i: any, _i: number) =>
+      idx === _i ? { ...i, completed: true } : i,
     );
+    _saveData({ ...dao, list: state });
+    setDList(state);
   };
 
   return { dao, dList, initDaoxin, checkList };
