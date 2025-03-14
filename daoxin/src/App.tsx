@@ -1,26 +1,33 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 import './App.css';
 
 import Header from './components/header/Header';
 import SideMenu from './components/aside/SideMenu';
 
-import DaoXinGraph from './features/daoxingraph';
+import DaoXinGraph from './features/daoxingraph/DaoxinGraph';
 import DaoXinTodo from './features/daoxintodo/DaoXinTodo';
 
+import useDaoxin from './hooks/useDaoxin';
+
 function App() {
+  const { initDaoxin } = useDaoxin();
   const [isSide, setIsSide] = useState(false);
 
   const handleSideMenu = () => {
     setIsSide((prev) => !prev);
   };
 
+  useEffect(() => {
+    initDaoxin();
+  }, []);
+
   return (
     <div className='wrap'>
       <Header navHandler={handleSideMenu} />
       <SideMenu isAvail={isSide} />
       <main role='main'>
-        <DaoXinGraph gauge={1} />
+        <DaoXinGraph />
         <DaoXinTodo />
       </main>
       <footer></footer>
