@@ -6,7 +6,7 @@ import { DaoXin, DailyList, DaoXinProps } from '../store/daoxin';
 const DAOXIN = 'daoxin';
 const SALT = '일체유심조';
 const MIN_GAUGE = 1;
-const MAX_GAUGE = 77;
+const MAX_GAUGE = 78;
 const TODAY = new Date().toISOString().split('T')[0];
 
 const useDaoxin = () => {
