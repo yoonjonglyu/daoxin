@@ -1,0 +1,17 @@
+.side-modal {
+  position: relative;
+  display: flex;
+  flex-flow: row wrap;
+  width: 100%;
+  height: 100%;
+}
+.side-modal button {
+  position: absolute;
+  bottom: 8px;
+  left: 0;
+  width: 100%;
+}
+.side-modal .side-content {
+  flex: 1;
+  overflow: auto;
+}
