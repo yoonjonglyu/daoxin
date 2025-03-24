@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import './SideMenu.css';
 
@@ -7,25 +7,51 @@ export interface SideMenuProps {
 }
 
 const SideMenu: React.FC<SideMenuProps> = ({ isAvail }) => {
+  const [sideData, setSideData] = useState<null | string>(null);
+
+  const handleSideView = (type: string) => {
+    const dumy: any = {
+      about: 'about',
+      core: 'core',
+      medi: 'medi',
+      change: <h1>todo</h1>,
+    };
+    setSideData(dumy[type]);
+  };
+
   return (
     <aside className={`sidemenu-container ${isAvail ? 'active' : ''}`}>
-      <ul>
-        <li>About</li>
+      <div className={`side-view ${sideData !== null ? 'active' : ''}`}>
+        {sideData}
+      </div>
+      <ol>
         <li>
-          기법...
-          <ul>
-            <li>참장</li>
-            <li>명상</li>
-          </ul>
+          <a href='#' onClick={() => handleSideView('about')}>
+            About
+          </a>
         </li>
-        <li>할일변경</li>
-      </ul>
+        <li>
+          <a href='#' onClick={() => handleSideView('core')}>
+            참장
+          </a>
+        </li>
+        <li>
+          <a href='#' onClick={() => handleSideView('medi')}>
+            명상
+          </a>
+        </li>
+        <li>
+          <a href='#' onClick={() => handleSideView('change')}>
+            할일변경
+          </a>
+        </li>
+      </ol>
       <p>
         <strong>App Info.</strong>
         <br />
-        <span>email</span>
+        <span>Email : yunjonglyu@gmail.com</span>
         <br />
-        <span>version</span>
+        <span>Version : v1.0.0</span>
       </p>
     </aside>
   );

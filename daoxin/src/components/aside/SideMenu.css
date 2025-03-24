@@ -4,7 +4,18 @@
   width: calc(100% - 3rem);
   height: 100vh;
   background: rgb(29, 29, 29);
+  z-index: 9999;
 }
 .sidemenu-container.active {
   display: block;
+}
+.sidemenu-container ul,ol {
+  list-style: none;
+  margin: 3px auto;
+  padding: 0;
+}
+.sidemenu-container .side-view {
+  position: absolute;
+  z-index: 99999;
+  background: rgb(29, 29, 29);
 }
