@@ -1,7 +1,7 @@
 import React from 'react';
 import './DaoxinGraph.css';
 
-import CGraph from '../../components/CGraph';
+import CGraph from '../../components/cgraph/CGraph';
 
 import useDaoxin from '../../hooks/useDaoxin';
 
