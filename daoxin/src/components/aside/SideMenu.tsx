@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 
 import './SideMenu.css';
 
+import SideModal from '../sidemodal/SideModal';
+
 export interface SideMenuProps {
   isAvail: boolean;
 }
@@ -15,6 +17,7 @@ const SideMenu: React.FC<SideMenuProps> = ({ isAvail }) => {
       core: 'core',
       medi: 'medi',
       change: <h1>todo</h1>,
+      close: null,
     };
     setSideData(dumy[type]);
   };
@@ -22,7 +25,9 @@ const SideMenu: React.FC<SideMenuProps> = ({ isAvail }) => {
   return (
     <aside className={`sidemenu-container ${isAvail ? 'active' : ''}`}>
       <div className={`side-view ${sideData !== null ? 'active' : ''}`}>
-        {sideData}
+        <SideModal closeCb={() => handleSideView('close')}>
+          {sideData}
+        </SideModal>
       </div>
       <ol>
         <li>
