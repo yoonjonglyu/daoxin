@@ -4,22 +4,22 @@ import './SideMenu.css';
 
 import SideModal from '../sidemodal/SideModal';
 
+export interface MenuItemProps {
+  key: string;
+  title: string;
+  content: React.ReactNode;
+}
 export interface SideMenuProps {
   isAvail: boolean;
+  menuList: Array<MenuItemProps>;
 }
 
-const SideMenu: React.FC<SideMenuProps> = ({ isAvail }) => {
-  const [sideData, setSideData] = useState<null | string>(null);
+const SideMenu: React.FC<SideMenuProps> = ({ isAvail, menuList }) => {
+  const [sideData, setSideData] = useState<null | React.ReactNode>(null);
 
-  const handleSideView = (type: string) => {
-    const dumy: any = {
-      about: 'about',
-      core: 'core',
-      medi: 'medi',
-      change: <h1>todo</h1>,
-      close: null,
-    };
-    setSideData(dumy[type]);
+  const handleSideView = (type: number | 'close') => {
+    if (type === 'close') return setSideData(null);
+    setSideData(menuList[type].content);
   };
 
   return (
@@ -30,26 +30,15 @@ const SideMenu: React.FC<SideMenuProps> = ({ isAvail }) => {
         </SideModal>
       </div>
       <ol>
-        <li>
-          <a href='#' onClick={() => handleSideView('about')}>
-            About
-          </a>
-        </li>
-        <li>
-          <a href='#' onClick={() => handleSideView('core')}>
-            참장
-          </a>
-        </li>
-        <li>
-          <a href='#' onClick={() => handleSideView('medi')}>
-            명상
-          </a>
-        </li>
-        <li>
-          <a href='#' onClick={() => handleSideView('change')}>
-            할일변경
-          </a>
-        </li>
+        {menuList.map((item, _idx) => {
+          return (
+            <li key={item.key}>
+              <a href='#' onClick={() => handleSideView(_idx)}>
+                {item.title}
+              </a>
+            </li>
+          );
+        })}
       </ol>
       <p>
         <strong>App Info.</strong>
