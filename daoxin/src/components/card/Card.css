@@ -1,0 +1,13 @@
+.card {
+  width: 100%;
+  padding: 24px;
+  background-color: #fefefe;
+  border: 1px solid #e0e0e0;
+  border-radius: 16px;
+  font-family: 'Noto Serif KR', serif;
+  color: #2e3d49;
+  max-width: 90%;
+  margin: 0 auto;
+  line-height: 1.8;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}

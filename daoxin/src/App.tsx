@@ -4,6 +4,7 @@ import './App.css';
 
 import Header from './components/header/Header';
 import SideMenu, { MenuItemProps } from './components/aside/SideMenu';
+import Card from './components/card/Card';
 
 import DaoXinGraph from './features/daoxingraph/DaoxinGraph';
 import DaoXinTodo from './features/daoxintodo/DaoXinTodo';
@@ -13,22 +14,9 @@ import useDaoxin from './hooks/useDaoxin';
 const sideMenu: Array<MenuItemProps> = [
   {
     key: 'about',
-    title: 'about',
+    title: 'About',
     content: (
-      <div
-        style={{
-          width: '100%',
-          padding: '24px',
-          backgroundColor: '#fefefe',
-          border: '1px solid #e0e0e0',
-          borderRadius: '16px',
-          fontFamily: "'Noto Serif KR', serif",
-          color: '#2e3d49',
-          maxWidth: '90%',
-          margin: '0 auto',
-          lineHeight: '1.8',
-          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',
-        }}>
+      <Card>
         <p>
           <strong>해당 앱은 사용자의 습관 형성과 관리를 위한 앱</strong>입니다.
         </p>
@@ -80,27 +68,14 @@ const sideMenu: Array<MenuItemProps> = [
           즉각적인 피드백을 통해 <em>꾸준함과 항상성을 유지하도록 유도</em>
           합니다.
         </p>
-      </div>
+      </Card>
     ),
   },
   {
     key: 'core',
     title: '참장공',
     content: (
-      <div
-        style={{
-          width: '100%',
-          padding: '24px',
-          backgroundColor: '#fefefe',
-          border: '1px solid #e0e0e0',
-          borderRadius: '16px',
-          fontFamily: "'Noto Serif KR', serif",
-          color: '#2e3d49',
-          maxWidth: '90%',
-          margin: '0 auto',
-          lineHeight: '1.8',
-          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',
-        }}>
+      <Card>
         <div
           style={{
             fontSize: '26px',
@@ -124,27 +99,14 @@ const sideMenu: Array<MenuItemProps> = [
           <strong>스트레스 해소, 집중력 향상, 신체 정렬 회복</strong> 등 심신
           건강을 위한 명상법으로도 널리 권장되고 있습니다.
         </p>
-      </div>
+      </Card>
     ),
   },
   {
     key: 'medi',
     title: '명상',
     content: (
-      <div
-        style={{
-          width: '100%',
-          padding: '24px',
-          backgroundColor: '#fefefe',
-          border: '1px solid #e0e0e0',
-          borderRadius: '16px',
-          fontFamily: "'Noto Serif KR', serif",
-          color: '#2e3d49',
-          maxWidth: '90%',
-          margin: '0 auto',
-          lineHeight: '1.8',
-          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',
-        }}>
+      <Card>
         <div
           style={{
             fontSize: '26px',
@@ -170,10 +132,10 @@ const sideMenu: Array<MenuItemProps> = [
           <strong>하루 5분</strong>의 명상은 삶에 깊은 안정과 여유를 불어넣어
           줍니다.
         </p>
-      </div>
+      </Card>
     ),
   },
-  { key: 'change', title: '할일변경', content: <h1>todo</h1> },
+  { key: 'change', title: '할일변경', content: <Card>todo</Card> },
 ];
 
 function App() {
