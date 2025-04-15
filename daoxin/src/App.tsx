@@ -10,7 +10,10 @@ import DaoXinGraph from './features/daoxingraph/DaoxinGraph';
 import DaoXinTodo from './features/daoxintodo/DaoXinTodo';
 
 import useDaoxin from './hooks/useDaoxin';
-
+import TodoList from './components/todo/TodoList';
+/**
+ * @description 해당 부분 컴포넌트 추출 필요 & TodoList 컴포넌트 내부 로직들 props으로 전달
+ */
 const sideMenu: Array<MenuItemProps> = [
   {
     key: 'about',
@@ -135,7 +138,15 @@ const sideMenu: Array<MenuItemProps> = [
       </Card>
     ),
   },
-  { key: 'change', title: '할일변경', content: <Card>todo</Card> },
+  {
+    key: 'change',
+    title: '할일변경',
+    content: (
+      <Card>
+        <TodoList />
+      </Card>
+    ),
+  },
 ];
 
 function App() {
