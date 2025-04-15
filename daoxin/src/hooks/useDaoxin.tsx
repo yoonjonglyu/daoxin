@@ -88,7 +88,14 @@ const useDaoxin = () => {
     setDao(prevState);
     setDList(prevState.list);
   };
-
+  const editList = (value: typeof dList) => {
+    const updatedDao = {
+      ...dao,
+      list: value,
+    };
+    _saveData(updatedDao);
+    setDList(value);
+  };
   const checkList = async (idx: number) => {
     const { updatedList, allCompleted } = dList.reduce(
       (result, item, i) => {
@@ -123,7 +130,7 @@ const useDaoxin = () => {
     setDao(updatedDao);
   };
 
-  return { dao, dList, initDaoxin, checkList };
+  return { dao, dList, initDaoxin, checkList, editList };
 };
 
 export default useDaoxin;
