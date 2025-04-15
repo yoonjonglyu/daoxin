@@ -3,11 +3,7 @@ import { decryptData, encryptData, encryptedDataProps } from '../utils/crypt';
 
 import { DaoXin, DailyList, DaoXinProps } from '../store/daoxin';
 
-const DAOXIN = 'daoxin';
-const SALT = '일체유심조';
-const MIN_GAUGE = 1;
-const MAX_GAUGE = 78;
-const TODAY = new Date().toISOString().split('T')[0];
+import { DAOXIN, SALT, MIN_GAUGE, MAX_GAUGE, TODAY, DAOXIN_DEFAULT } from '../value';
 
 const useDaoxin = () => {
   const [dao, setDao] = useAtom(DaoXin);
@@ -43,17 +39,8 @@ const useDaoxin = () => {
     const storedData = localStorage.getItem(DAOXIN);
 
     if (!storedData) {
-      const defaultValue: DaoXinProps = {
-        gauge: 1,
-        list: [
-          { idx: 0, todo: '참장공', completed: false, updateAt: TODAY },
-          { idx: 1, todo: '명상', completed: false, updateAt: TODAY },
-          { idx: 2, todo: '운동', completed: false, updateAt: TODAY },
-        ],
-        updateAt: TODAY,
-      };
-      await _saveData(defaultValue);
-      setDao(defaultValue);
+      await _saveData(DAOXIN_DEFAULT);
+      setDao(DAOXIN_DEFAULT);
       return;
     }
 
