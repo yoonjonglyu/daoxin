@@ -11,7 +11,7 @@ const SideModal: React.FC<SideModalProps> = ({ children, closeCb }) => {
   return (
     <div className='side-modal'>
       <article className='side-content'>{children}</article>
-      <button onClick={closeCb}>Close</button>
+      <button className='close' onClick={closeCb}>Close</button>
     </div>
   );
 };
