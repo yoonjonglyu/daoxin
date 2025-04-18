@@ -4,6 +4,7 @@ import react from '@vitejs/plugin-react-swc';
 import { ViteFaviconsPlugin } from 'vite-plugin-favicon';
 
 export default defineConfig({
+  base: '/daoxin/',
   plugins: [
     react(),
     ViteFaviconsPlugin({
