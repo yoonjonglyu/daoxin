@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import './App.css';
 
 import Header from './components/header/Header';
-import SideMenu, { MenuItemProps } from './components/aside/SideMenu';
+import SideMenu from './components/aside/SideMenu';
 
 import DaoXinGraph from './features/daoxingraph/DaoxinGraph';
 import DaoXinTodo from './features/daoxintodo/DaoXinTodo';
