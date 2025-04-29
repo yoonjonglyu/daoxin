@@ -1,37 +1,31 @@
 import React, { useState } from 'react';
 import './TodoList.css';
 
-import useDaoxin from '../../hooks/useDaoxin';
+export interface TodoListProps {
+  list: Array<{
+    idx: number;
+    todo: string;
+    completed: boolean;
+    updateAt: string;
+  }>;
+  addTodo: (newTodo: string) => void;
+  removeTodo: (index: number) => void;
+  editTodo: (index: number, updatedTodo: string) => void;
+}
 
-const TodoList: React.FC = () => {
-  const { dList, editList } = useDaoxin();
+const TodoList: React.FC<TodoListProps> = ({
+  list,
+  addTodo,
+  editTodo,
+  removeTodo,
+}) => {
   const [newTodo, setNewTodo] = useState<string>('');
 
-  const addTodo = () => {
+  const _addTodo = () => {
     if (newTodo.trim()) {
-      editList([
-        ...dList,
-        {
-          idx: dList.length > 0 ? dList[dList.length - 1].idx + 1 : 1,
-          todo: newTodo,
-          completed: true,
-          updateAt: new Date().toISOString(),
-        },
-      ]);
+      addTodo(newTodo);
       setNewTodo('');
     }
-  };
-
-  const editTodo = (index: number, updatedTodo: string) => {
-    editList(
-      dList.map((todo) =>
-        todo.idx === index ? { ...todo, todo: updatedTodo } : todo,
-      ),
-    );
-  };
-
-  const removeTodo = (index: number) => {
-    editList(dList.filter((todo) => todo.idx !== index));
   };
 
   return (
@@ -45,12 +39,12 @@ const TodoList: React.FC = () => {
           placeholder='새로운 할일 추가'
           className='todo-input'
         />
-        <button onClick={addTodo} className='todo-add-button'>
+        <button onClick={_addTodo} className='todo-add-button'>
           추가
         </button>
       </div>
       <ul className='todo-list'>
-        {dList.map((todo) => (
+        {list.map((todo) => (
           <li key={todo.idx} className='todo-item'>
             <input
               type='text'
