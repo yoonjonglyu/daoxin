@@ -13,6 +13,7 @@
     "deploy": "gh-pages -d dist"
   },
   "dependencies": {
+    "isa-util": "^1.0.17",
     "jotai": "^2.12.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
