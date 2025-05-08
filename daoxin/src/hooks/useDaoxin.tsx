@@ -1,5 +1,5 @@
 import { useAtom } from 'jotai';
-import { decryptData, encryptData, encryptedDataProps } from '../utils/crypt';
+import { decryptData, encryptData, setLocalStorage, getLocalStorage } from 'isa-util';
 
 import { DaoXin, DailyList, DaoXinProps } from '../store/daoxin';
 
@@ -17,7 +17,7 @@ const useDaoxin = () => {
         SALT,
       );
       if (typeof localStorage !== 'undefined') {
-        localStorage.setItem(DAOXIN, JSON.stringify(encryptedValue));
+        setLocalStorage(DAOXIN, JSON.stringify(encryptedValue));
       } else {
         console.error('localStorage is not supported in this environment.');
       }
@@ -36,7 +36,7 @@ const useDaoxin = () => {
   };
 
   const initDaoxin = async () => {
-    const storedData = localStorage.getItem(DAOXIN);
+    const storedData = getLocalStorage<string>(DAOXIN);
 
     if (!storedData) {
       await _saveData(DAOXIN_DEFAULT);
@@ -44,7 +44,7 @@ const useDaoxin = () => {
       return;
     }
 
-    const encrypted = JSON.parse(storedData) as encryptedDataProps;
+    const encrypted = JSON.parse(storedData) as any;
     const decryptedState = await decryptData(
       encrypted.encryptedData,
       encrypted.iv,
