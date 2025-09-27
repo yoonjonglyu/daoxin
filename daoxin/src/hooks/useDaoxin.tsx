@@ -29,7 +29,7 @@ const useDaoxin = () => {
         SALT,
       );
       if (typeof localStorage !== 'undefined') {
-        setLocalStorage(DAOXIN, JSON.stringify(encryptedValue));
+        setLocalStorage(DAOXIN, encryptedValue);
       } else {
         console.error('localStorage is not supported in this environment.');
       }
@@ -61,8 +61,7 @@ const useDaoxin = () => {
       setDao(DAOXIN_DEFAULT);
       return;
     }
-
-    const encrypted = JSON.parse(storedData) as any;
+    const encrypted = storedData as any;
     const decryptedState = await decryptData(
       encrypted.encryptedData,
       encrypted.iv,
@@ -90,8 +89,8 @@ const useDaoxin = () => {
       nextState.updateAt = TODAY;
     }
 
-    await _saveData(nextState);
-    setDao(nextState);
+    await _saveData(prevState);
+    setDao(prevState);
   };
   const editList = (value: typeof dList) => {
     const updatedDao = {
