@@ -2,21 +2,11 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react-swc';
 import { VitePWA } from 'vite-plugin-pwa';
-import { ViteFaviconsPlugin } from 'vite-plugin-favicon';
 
 export default defineConfig({
   base: '/daoxin/',
   plugins: [
     react(),
-    ViteFaviconsPlugin({
-      logo: 'src/assets/favicon.png',
-      favicons: {
-        appName: 'Daoxin',
-        appDescription: 'Daoxin - A simple and elegant habit app',
-        developerName: 'ISA',
-        path: 'assets/',
-      },
-    }),
     VitePWA({
       registerType: 'autoUpdate',
       manifest: {
@@ -38,5 +28,5 @@ export default defineConfig({
         ],
       },
     }),
-  ]
+  ],
 });
