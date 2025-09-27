@@ -5,5 +5,5 @@ import {
 
 export default defineConfig({
   preset,
-  images: ['src/assets/favicon.png'],
+  images: ['public/favicon.png'],
 });
