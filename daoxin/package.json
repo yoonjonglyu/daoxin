@@ -31,6 +31,7 @@
     "typescript": "~5.7.2",
     "typescript-eslint": "^8.22.0",
     "vite": "^6.1.0",
-    "vite-plugin-favicon": "^1.0.8"
+    "vite-plugin-favicon": "^1.0.8",
+    "vite-plugin-pwa": "^1.0.3"
   }
 }
