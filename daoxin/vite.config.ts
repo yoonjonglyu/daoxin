@@ -19,12 +19,12 @@ export default defineConfig({
         description: 'Daoxin - A simple and elegant habit app',
         icons: [
           {
-            src: '/favicon.ico',
+            src: '/daoxin/favicon.ico',
             sizes: '64x64 32x32 24x24 16x16',
             type: 'image/x-icon',
           },
-          { src: '/pwa-192x192.png', type: 'image/png', sizes: '192x192' },
-          { src: '/pwa-512x512.png', type: 'image/png', sizes: '512x512' },
+          { src: '/daoxin/pwa-192x192.png', type: 'image/png', sizes: '192x192' },
+          { src: '/daoxin/pwa-512x512.png', type: 'image/png', sizes: '512x512' },
         ],
       },
     }),
