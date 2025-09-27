@@ -1,9 +1,21 @@
 import { useAtom } from 'jotai';
-import { decryptData, encryptData, setLocalStorage, getLocalStorage } from 'isa-util';
+import {
+  decryptData,
+  encryptData,
+  setLocalStorage,
+  getLocalStorage,
+} from 'isa-util';
 
 import { DaoXin, DailyList, DaoXinProps } from '../store/daoxin';
 
-import { DAOXIN, SALT, MIN_GAUGE, MAX_GAUGE, TODAY, DAOXIN_DEFAULT } from '../value';
+import {
+  DAOXIN,
+  SALT,
+  MIN_GAUGE,
+  MAX_GAUGE,
+  TODAY,
+  DAOXIN_DEFAULT,
+} from '../value';
 
 const useDaoxin = () => {
   const [dao, setDao] = useAtom(DaoXin);
@@ -25,14 +37,20 @@ const useDaoxin = () => {
       console.error('데이터 저장 중 오류 발생:', error);
     }
   };
-
+  const _normalizeDate = (date: Date) => {
+    const normalized = new Date(date);
+    normalized.setHours(6, 0, 0, 0); // 하루 시작을 06:00으로
+    // 만약 지금 시간이 6시 이전이라면, 어제를 기준으로 밀어줌
+    if (date.getHours() < 6) {
+      normalized.setDate(normalized.getDate() - 1);
+    }
+    return normalized;
+  };
   const _getDaysDifference = (prevDate: string, currentDate: string) => {
-    const prev = new Date(prevDate);
-    const curr = new Date(currentDate);
-    prev.setHours(0, 0, 0, 0); // 시간을 00:00:00으로 설정
-    curr.setHours(0, 0, 0, 0); // 시간을 00:00:00으로 설정
+    const prev = _normalizeDate(new Date(prevDate));
+    const curr = _normalizeDate(new Date(currentDate));
     const diffTime = curr.getTime() - prev.getTime();
-    return Math.floor(diffTime / (1000 * 60 * 60 * 24)); // 밀리초 -> 일(day) 변환
+    return Math.floor(diffTime / (1000 * 60 * 60 * 24));
   };
 
   const initDaoxin = async () => {
@@ -52,28 +70,28 @@ const useDaoxin = () => {
       SALT,
     );
     const prevState: DaoXinProps = JSON.parse(decryptedState);
+    const nextState = { ...DAOXIN_DEFAULT, ...prevState };
 
     const daysPassed = _getDaysDifference(prevState.updateAt, TODAY);
 
     if (daysPassed > 0) {
       const allTasksCompleted = prevState.list.every((task) => task.completed);
       if (allTasksCompleted)
-        prevState.gauge = Math.min(MAX_GAUGE, prevState.gauge + 1);
+        nextState.gauge = Math.min(MAX_GAUGE, prevState.gauge + 1);
       // 일괄적으로 지나간 일자만큼 gague를 감소시킨다.
-      prevState.gauge = Math.max(MIN_GAUGE, prevState.gauge - daysPassed);
+      nextState.gauge = Math.max(MIN_GAUGE, prevState.gauge - daysPassed);
       // list 초기화 (completed: false, updateAt: today)
-      prevState.list = prevState.list.map((task) => ({
+      nextState.list = prevState.list.map((task) => ({
         ...task,
         completed: false,
         updateAt: TODAY,
       }));
 
-      prevState.updateAt = TODAY;
+      nextState.updateAt = TODAY;
     }
 
-    await _saveData(prevState);
-    setDao(prevState);
-    setDList(prevState.list);
+    await _saveData(nextState);
+    setDao(nextState);
   };
   const editList = (value: typeof dList) => {
     const updatedDao = {
@@ -113,7 +131,6 @@ const useDaoxin = () => {
     }
 
     await _saveData(updatedDao);
-    setDList(updatedList);
     setDao(updatedDao);
   };
 
