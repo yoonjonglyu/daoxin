@@ -89,8 +89,8 @@ const useDaoxin = () => {
       nextState.updateAt = TODAY;
     }
 
-    await _saveData(prevState);
-    setDao(prevState);
+    await _saveData(nextState);
+    setDao(nextState);
   };
   const editList = (value: typeof dList) => {
     const updatedDao = {
