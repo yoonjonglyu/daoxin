@@ -47,8 +47,8 @@ const useDaoxin = () => {
     return normalized;
   };
   const _getDaysDifference = (prevDate: string, currentDate: string) => {
-    const prev = _normalizeDate(new Date(prevDate));
-    const curr = new Date(currentDate);
+    const prev = new Date(prevDate);
+    const curr = _normalizeDate(new Date(currentDate));
     const diffTime = curr.getTime() - prev.getTime();
     return Math.floor(diffTime / (1000 * 60 * 60 * 24));
   };
