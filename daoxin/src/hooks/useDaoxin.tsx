@@ -72,7 +72,6 @@ const useDaoxin = () => {
     const nextState = { ...DAOXIN_DEFAULT, ...prevState };
 
     const daysPassed = _getDaysDifference(prevState.updateAt, TODAY);
-
     if (daysPassed > 0) {
       const allTasksCompleted = prevState.list.every((task) => task.completed);
       if (allTasksCompleted)
@@ -83,12 +82,10 @@ const useDaoxin = () => {
       nextState.list = prevState.list.map((task) => ({
         ...task,
         completed: false,
-        updateAt: _normalizeDate(new Date(TODAY)).toISOString().split('T')[0],
+        updateAt: TODAY,
       }));
 
-      nextState.updateAt = _normalizeDate(new Date(TODAY))
-        .toISOString()
-        .split('T')[0];
+      nextState.updateAt = TODAY;
     }
 
     await _saveData(nextState);
