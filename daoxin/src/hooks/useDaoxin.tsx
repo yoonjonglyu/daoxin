@@ -125,7 +125,6 @@ const useDaoxin = () => {
     };
 
     if (allCompleted) {
-      updatedDao.updateAt = TODAY; // YYYY-MM-DD
       updatedDao.gauge = Math.min(MAX_GAUGE, dao.gauge + 1);
     }
 
