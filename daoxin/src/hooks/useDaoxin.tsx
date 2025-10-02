@@ -47,10 +47,10 @@ const useDaoxin = () => {
     return normalized;
   };
   const _getDaysDifference = (prevDate: string, currentDate: string) => {
-    const prev = new Date(prevDate);
+    const prev = _normalizeDate(new Date(prevDate));
     const curr = _normalizeDate(new Date(currentDate));
-    const diffTime = curr.getDate() - prev.getDate();
-    return diffTime;
+    const diffTime = curr.getTime() - prev.getTime();
+    return Math.floor(diffTime / (1000 * 60 * 60 * 24));
   };
 
   const initDaoxin = async () => {
@@ -86,7 +86,9 @@ const useDaoxin = () => {
         updateAt: _normalizeDate(new Date(TODAY)).toISOString().split('T')[0],
       }));
 
-      nextState.updateAt = _normalizeDate(new Date(TODAY)).toISOString().split('T')[0];
+      nextState.updateAt = _normalizeDate(new Date(TODAY))
+        .toISOString()
+        .split('T')[0];
     }
 
     await _saveData(nextState);
