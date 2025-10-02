@@ -83,10 +83,10 @@ const useDaoxin = () => {
       nextState.list = prevState.list.map((task) => ({
         ...task,
         completed: false,
-        updateAt: TODAY,
+        updateAt: _normalizeDate(new Date(TODAY)).toISOString().split('T')[0],
       }));
 
-      nextState.updateAt = TODAY;
+      nextState.updateAt = _normalizeDate(new Date(TODAY)).toISOString().split('T')[0];
     }
 
     await _saveData(nextState);
