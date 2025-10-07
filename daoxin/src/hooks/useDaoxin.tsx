@@ -74,10 +74,11 @@ const useDaoxin = () => {
     const daysPassed = _getDaysDifference(prevState.updateAt, TODAY);
     if (daysPassed > 0) {
       const allTasksCompleted = prevState.list.every((task) => task.completed);
+
       if (allTasksCompleted)
         nextState.gauge = Math.min(MAX_GAUGE, prevState.gauge + 1);
       // 일괄적으로 지나간 일자만큼 gague를 감소시킨다.
-      nextState.gauge = Math.max(MIN_GAUGE, prevState.gauge - daysPassed);
+      nextState.gauge = Math.max(MIN_GAUGE, nextState.gauge - daysPassed);
       // list 초기화 (completed: false, updateAt: today)
       nextState.list = prevState.list.map((task) => ({
         ...task,
