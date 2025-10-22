@@ -3,7 +3,7 @@ export const SALT = '일체유심조';
 export const MIN_GAUGE = 1;
 export const MAX_GAUGE = 78;
 const now = new Date();
-export const TODAY = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+export const TODAY = `${now.getFullYear()}/${String(now.getMonth()+1).padStart(2,'0')}/${String(now.getDate()).padStart(2,'0')}`;
 export const DAOXIN_LIST = [
   { idx: 0, todo: '참장공', completed: false, updateAt: TODAY },
   { idx: 1, todo: '명상', completed: false, updateAt: TODAY },
