@@ -1,0 +1,36 @@
+.main-container {
+  padding: 16px;
+  padding-bottom: 80px;
+  background-color: #0f172a;
+  min-height: 100vh;
+  color: #e2e8f0;
+  box-sizing: border-box;
+}
+.main-container .status-box {
+  background: #1e293b;
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+.main-container .status-box .status-title {
+  font-size: 14px;
+  opacity: 0.7;
+}
+.main-container .status-box .status-level {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.main-container .status-box .progress-bar {
+  height: 8px;
+  background: #334155;
+  border-radius: 4px;
+  overflow: hidden;
+}
+.main-container .status-box  .progress-bar .progress-fill {
+  height: 100%;
+  background: #3b82f6;
+  width: 60%;
+}
