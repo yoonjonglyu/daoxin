@@ -1,23 +1,14 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
+import { RouterProvider } from 'react-router';
 
 import './App.css';
 
-import Header from './components/header/Header';
-import SideMenu from './components/aside/SideMenu';
-
-import DaoXinGraph from './features/daoxingraph/DaoxinGraph';
-import DaoXinTodo from './features/daoxintodo/DaoXinTodo';
-import DaoXinAside from './features/daoxinaside/DaoXinAside';
+import router from './pages/index';
 
 import useDaoxin from './hooks/useDaoxin';
 
 function App() {
   const { initDaoxin } = useDaoxin();
-  const [isSide, setIsSide] = useState(false);
-
-  const handleSideMenu = () => {
-    setIsSide((prev) => !prev);
-  };
 
   useEffect(() => {
     initDaoxin();
@@ -25,13 +16,7 @@ function App() {
 
   return (
     <div className='wrap'>
-      <Header navHandler={handleSideMenu} />
-      <SideMenu isAvail={isSide} menuList={DaoXinAside} />
-      <main role='main'>
-        <DaoXinGraph />
-        <DaoXinTodo />
-      </main>
-      <footer></footer>
+      <RouterProvider router={router} />
     </div>
   );
 }
