@@ -22,11 +22,14 @@ export interface Daoxin {
 export type DaoxinRank = 'S' | 'A' | 'B' | 'C' | 'D';
 
 export interface Progress {
-  totalCompleted: number;
-  currentStreak: number;
-  longestStreak: number;
+  level: number;
+  exp: number;
 
-  lastCompletedAt?: Date;
+  daoxinGauge: number;
+
+  streak: number;
+
+  totalCompleted: number;
 }
 export interface PenaltyRule {
   enabled: boolean;

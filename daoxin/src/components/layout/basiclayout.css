@@ -1,0 +1,9 @@
+.basic-layout {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+.basic-layout main {
+  flex: 1;
+  overflow: auto;
+}
