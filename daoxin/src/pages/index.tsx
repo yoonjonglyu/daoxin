@@ -1,6 +1,6 @@
 import { createBrowserRouter, Outlet } from 'react-router';
 
-import BasicLayout from '../components/layout/basiclayout';
+import BasicLayout from '../components/layout/BasicLayout';
 
 import MainPage from './main';
 import CategoryPage from './category';
