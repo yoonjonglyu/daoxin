@@ -4,16 +4,15 @@ import './CGraph.css';
 
 export interface CGraphProps {
   style?: React.CSSProperties;
+  className?: string;
   children?: React.ReactNode;
 }
 
-const CGraph: React.FC<CGraphProps> = ({ style, children }) => {
+const CGraph: React.FC<CGraphProps> = ({ style, className, children }) => {
   return (
     <div
-      className='c-graph'
-      style={{
-        ...style,
-      }}>
+      className={`c-graph ${className || ''}`}
+      style={style}>
       <div className='inner-area'>{children}</div>
     </div>
   );

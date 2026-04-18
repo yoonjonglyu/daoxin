@@ -2,95 +2,46 @@ import type { FC } from 'react';
 
 import './main.css';
 
+import DaoXinGraph from '../../features/daoxingraph/DaoxinGraph';
+import DaoXinTodo from '../../features/daoxintodo/DaoXinTodo';
+import DaoXinSchedule from '../../features/daoxinschedule/DaoXinSchedule';
+import useDaoxin from '../../hooks/useDaoxin';
+
 const MainPage: FC = () => {
+  const { dao } = useDaoxin();
+  const gauge = dao.gauge;
+
+  const getStageClass = (val: number) => {
+    if (val >= 77) return 'stage-cheon-gyo'; // 천교 (Gold)
+    if (val >= 50) return 'stage-eung-sim'; // 응심 (Purple)
+    if (val >= 25) return 'stage-seung-hwa'; // 승화
+    return 'stage-bal-sim'; // 발심
+  };
+
   return (
     <div className='main-container'>
       {/* STATUS */}
-      <div className='status-box'>
-        <div style={{ fontSize: '14px', opacity: 0.7 }}>현재 경지</div>
-        <div style={{ fontSize: '20px', fontWeight: 600, marginBottom: '8px' }}>
-          수행자 Lv.3
-        </div>
-
-        {/* 게이지 */}
+      <section className={`status-section ${getStageClass(gauge)}`}>
+        <span className='status-label'>현재 경지</span>
+        <h2 className='status-title'>수행자 Lv.3</h2>
+        <DaoXinGraph />
         <div className='progress-bar'>
-          <div className='progress-fill' />
+          <div className='progress-fill' style={{ width: `${gauge}%` }} />
         </div>
-        <div style={{ fontSize: '12px', opacity: 0.7 }}>
-          도심 6 / 10 · 🔥 5일 연속
-        </div>
-      </div>
+        <p className='status-stats'>도심 {gauge / 10} / 10 · 🔥 5일 연속</p>
+      </section>
 
       {/* HABIT */}
-      <div style={{ marginBottom: '20px' }}>
-        <div
-          style={{
-            fontSize: '14px',
-            marginBottom: '8px',
-            fontWeight: 600,
-          }}>
-          🔥 Daily Habit
-        </div>
-
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          {['운동', '명상', '독서'].map((item, idx) => (
-            <div
-              key={idx}
-              style={{
-                background: '#1e293b',
-                padding: '12px',
-                borderRadius: '12px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-              }}>
-              <span>{item}</span>
-              <input type='checkbox' />
-            </div>
-          ))}
-        </div>
-      </div>
+      <section className='content-section'>
+        <h3 className='section-title'>🔥 오늘의 수련</h3>
+        <DaoXinTodo />
+      </section>
 
       {/* SCHEDULE */}
-      <div>
-        <div
-          style={{
-            fontSize: '14px',
-            marginBottom: '8px',
-            fontWeight: 600,
-          }}>
-          📅 Today Schedule
-        </div>
-
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          {['알고리즘 공부', '프로젝트 작업'].map((item, idx) => (
-            <div
-              key={idx}
-              style={{
-                background: '#1e293b',
-                padding: '12px',
-                borderRadius: '12px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-              }}>
-              <span>{item}</span>
-              <button
-                style={{
-                  background: '#22c55e',
-                  border: 'none',
-                  borderRadius: '8px',
-                  padding: '6px 10px',
-                  color: '#0f172a',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                }}>
-                완료
-              </button>
-            </div>
-          ))}
-        </div>
-      </div>
+      <section className='content-section'>
+        <h3 className='section-title'>📅 세부 일정</h3>
+        <DaoXinSchedule />
+      </section>
     </div>
   );
 };
