@@ -1,15 +1,21 @@
-import React from 'react';
+import { type FC, useEffect } from 'react';
 import useSchedule from '../../hooks/useSchedule';
 
-const DaoXinSchedule: React.FC = () => {
-  const { schedules, completeSchedule } = useSchedule();
+const DaoXinSchedule: FC = () => {
+  const { schedules, completeSchedule, initSchedules } = useSchedule();
+
+  useEffect(() => {
+    initSchedules();
+  }, []);
 
   if (schedules.length === 0) {
     return (
-      <div className="empty-state">
-        <span className="empty-icon">📅</span>
-        <p className="empty-text">예정된 일정이 없습니다.</p>
-        <p className="empty-subtext">스케줄 메뉴에서 새로운 일정을 계획해 보세요.</p>
+      <div className='empty-state'>
+        <span className='empty-icon'>📅</span>
+        <p className='empty-text'>예정된 일정이 없습니다.</p>
+        <p className='empty-subtext'>
+          스케줄 메뉴에서 새로운 일정을 계획해 보세요.
+        </p>
       </div>
     );
   }
@@ -19,7 +25,9 @@ const DaoXinSchedule: React.FC = () => {
       {schedules.map((item) => (
         <div key={item.id} className='item-card'>
           <span>{item.config.name}</span>
-          <button className='complete-btn' onClick={() => completeSchedule(item.id)}>
+          <button
+            className='complete-btn'
+            onClick={() => completeSchedule(item.id)}>
             완료
           </button>
         </div>

@@ -21,6 +21,29 @@
   opacity: 0.6;
 }
 
+.schedule-container .category-selector {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.schedule-container .cat-btn {
+  background-color: #1e293b;
+  border: 1px solid #334155;
+  color: #94a3b8;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.schedule-container .cat-btn.active {
+  background-color: #22c55e;
+  color: #0f172a;
+  border-color: #22c55e;
+}
+
 .schedule-container .add-section {
   display: flex;
   gap: 8px;
@@ -79,6 +102,26 @@
   border-color: rgba(34, 197, 94, 0.2);
   background-color: rgba(30, 41, 59, 0.6);
 }
+
+/* 카테고리별 왼쪽 테두리 강조 */
+.schedule-container .task-card.cat-habit { border-left: 4px solid #06b6d4; }
+.schedule-container .task-card.cat-goal { border-left: 4px solid #f59e0b; }
+.schedule-container .task-card.cat-interval { border-left: 4px solid #6366f1; }
+.schedule-container .task-card.cat-periodic { border-left: 4px solid #f43f5e; }
+
+.schedule-container .cat-badge {
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 6px;
+  text-transform: uppercase;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.schedule-container .cat-badge.habit { background: rgba(6, 182, 212, 0.2); color: #06b6d4; }
+.schedule-container .cat-badge.goal { background: rgba(245, 158, 11, 0.2); color: #f59e0b; }
+.schedule-container .cat-badge.interval { background: rgba(99, 102, 241, 0.2); color: #6366f1; }
+.schedule-container .cat-badge.periodic { background: rgba(244, 63, 94, 0.2); color: #f43f5e; }
 
 .schedule-container .checkbox {
   width: 22px;

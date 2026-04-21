@@ -2,6 +2,7 @@ export interface Schedule {
   id: string;
   scheduleCategory: ScheduleCategory;
   type: ScheduleType;
+  completed: boolean;
 
   categoryId?: string;
   startDate?: string;

@@ -1,36 +1,55 @@
 import type { FC } from "react";
-import { useState } from "react";
-import useDaoxin from "../../hooks/useDaoxin";
+import { useState, useEffect } from "react";
+import useSchedule from "../../hooks/useSchedule";
+import type { Schedule, ScheduleCategory } from "../../types/schedule";
 import "./schedule.css";
 
 const SchedulePage: FC = () => {
-  const { dList, checkList, editList } = useDaoxin();
+  const { schedules, addSchedule, editSchedule, deleteSchedule, completeSchedule, initSchedules } = useSchedule();
   const [newTaskName, setNewTaskName] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState<ScheduleCategory>('habit');
 
-  const handleAddTodo = () => {
+  useEffect(() => {
+    initSchedules();
+  }, []);
+
+  const handleAddSchedule = () => {
     if (!newTaskName.trim()) return;
     
-    const nextIdx = dList.length > 0 ? Math.max(...dList.map(t => t.idx)) + 1 : 0;
-    const newItem = {
-      idx: nextIdx,
-      todo: newTaskName,
+    let config: Schedule['config'];
+    const base = { name: newTaskName };
+
+    // 카테고리에 따른 필수 데이터 초기화
+    if (selectedCategory === 'habit') {
+      config = { ...base, count: 0 };
+    } else if (selectedCategory === 'goal') {
+      config = { ...base, targetCount: 1, currentCount: 0, isCompleted: false };
+    } else if (selectedCategory === 'interval') {
+      config = { ...base, intervalDays: 1, totalCount: 0 };
+    } else {
+      // periodic
+      config = { ...base, periodStart: '', periodEnd: '', periodCount: 0, totalCount: 0, lastResetAt: '' };
+    }
+
+    const newSchedule: Schedule = {
+      id: Date.now().toString(),
+      scheduleCategory: selectedCategory,
+      type: 'daily',
       completed: false,
-      updateAt: new Date().toLocaleDateString('ko-KR')
+      config
     };
     
-    editList([...dList, newItem]);
+    addSchedule(newSchedule);
     setNewTaskName("");
   };
 
-  const handleUpdateTodoText = (index: number, newText: string) => {
-    const newList = [...dList];
-    newList[index] = { ...newList[index], todo: newText };
-    editList(newList);
-  };
+  const handleUpdateName = (id: string, newName: string) => {
+    const target = schedules.find(s => s.id === id);
+    if (!target) return;
 
-  const handleDeleteTodo = (index: number) => {
-    const newList = dList.filter((_, i) => i !== index);
-    editList(newList);
+    editSchedule(id, {
+      config: { ...target.config, name: newName } as any
+    });
   };
 
   return (
@@ -44,6 +63,18 @@ const SchedulePage: FC = () => {
       </div>
 
       {/* ADD NEW TASK */}
+      <div className="category-selector">
+        {(['habit', 'goal', 'interval', 'periodic'] as ScheduleCategory[]).map(cat => (
+          <button 
+            key={cat} 
+            className={`cat-btn ${selectedCategory === cat ? 'active' : ''}`}
+            onClick={() => setSelectedCategory(cat)}
+          >
+            {cat.toUpperCase()}
+          </button>
+        ))}
+      </div>
+
       <div className="add-section">
         <input
           type="text"
@@ -51,32 +82,32 @@ const SchedulePage: FC = () => {
           placeholder="새로운 수련 항목을 입력하세요..."
           value={newTaskName}
           onChange={(e) => setNewTaskName(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && handleAddTodo()}
+          onKeyDown={(e) => e.key === "Enter" && handleAddSchedule()}
         />
-        <button className="add-button" onClick={handleAddTodo}>추가</button>
+        <button className="add-button" onClick={handleAddSchedule}>추가</button>
       </div>
 
       {/* TASK LIST */}
       <div className="task-list">
-        {dList.map((item, index) => (
-          <div key={item.idx} className={`task-card ${item.completed ? 'completed' : ''}`}>
+        {schedules.map((item) => (
+          <div key={item.id} className={`task-card ${item.completed ? 'completed' : ''} cat-${item.scheduleCategory}`}>
             <input
               type="checkbox"
               className="checkbox"
               checked={item.completed}
-              onChange={() => !item.completed && checkList(index)}
-              disabled={item.completed}
+              onChange={() => completeSchedule(item.id)}
             />
+            <span className={`cat-badge ${item.scheduleCategory}`}>{item.scheduleCategory}</span>
             <input
               type="text"
               className={`task-title-input ${item.completed ? 'strikethrough' : ''}`}
-              value={item.todo}
-              onChange={(e) => handleUpdateTodoText(index, e.target.value)}
+              value={item.config.name}
+              onChange={(e) => handleUpdateName(item.id, e.target.value)}
               disabled={item.completed}
             />
             <span 
-              className="delete-icon" 
-              onClick={() => handleDeleteTodo(index)}
+              className="delete-icon"
+              onClick={() => deleteSchedule(item.id)}
               title="삭제"
             >
               🗑️
