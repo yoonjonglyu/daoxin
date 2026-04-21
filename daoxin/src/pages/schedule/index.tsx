@@ -1,145 +1,89 @@
 import type { FC } from "react";
 import { useState } from "react";
+import useDaoxin from "../../hooks/useDaoxin";
+import "./schedule.css";
 
 const SchedulePage: FC = () => {
-  const [tab, setTab] = useState<"today" | "tomorrow" | "week">("today");
-  const [selected, setSelected] = useState<string | null>(null);
+  const { dList, checkList, editList } = useDaoxin();
+  const [newTaskName, setNewTaskName] = useState("");
 
-  const mockData = {
-    today: ["알고리즘 공부", "프로젝트 작업"],
-    tomorrow: ["운동", "독서"],
-    week: ["사이드 프로젝트", "정리", "복습"],
+  const handleAddTodo = () => {
+    if (!newTaskName.trim()) return;
+    
+    const nextIdx = dList.length > 0 ? Math.max(...dList.map(t => t.idx)) + 1 : 0;
+    const newItem = {
+      idx: nextIdx,
+      todo: newTaskName,
+      completed: false,
+      updateAt: new Date().toLocaleDateString('ko-KR')
+    };
+    
+    editList([...dList, newItem]);
+    setNewTaskName("");
+  };
+
+  const handleUpdateTodoText = (index: number, newText: string) => {
+    const newList = [...dList];
+    newList[index] = { ...newList[index], todo: newText };
+    editList(newList);
+  };
+
+  const handleDeleteTodo = (index: number) => {
+    const newList = dList.filter((_, i) => i !== index);
+    editList(newList);
   };
 
   return (
-    <div
-      style={{
-        padding: "16px",
-        paddingBottom: "80px",
-        backgroundColor: "#0f172a",
-        minHeight: "100vh",
-        color: "#e2e8f0",
-        boxSizing: "border-box",
-      }}
-    >
+    <div className="schedule-container">
       {/* HEADER */}
-      <div style={{ marginBottom: "16px" }}>
-        <div style={{ fontSize: "20px", fontWeight: 600 }}>
-          📅 Schedule
-        </div>
-        <div style={{ fontSize: "12px", opacity: 0.6 }}>
-          계획된 수행을 관리합니다
+      <div className="header">
+        <div className="header-title">📅 수련 일정 관리</div>
+        <div className="header-subtitle">
+          수행 목록을 추가, 수정하거나 오늘의 정진을 기록하세요.
         </div>
       </div>
 
-      {/* TABS */}
-      <div
-        style={{
-          display: "flex",
-          gap: "8px",
-          marginBottom: "16px",
-        }}
-      >
-        {[
-          { key: "today", label: "Today" },
-          { key: "tomorrow", label: "Tomorrow" },
-          { key: "week", label: "Week" },
-        ].map((item) => (
-          <button
-            key={item.key}
-            onClick={() => {
-              setTab(item.key as any);
-              setSelected(null);
-            }}
-            style={{
-              flex: 1,
-              padding: "8px",
-              borderRadius: "10px",
-              border: "none",
-              cursor: "pointer",
-              background:
-                tab === item.key ? "#22c55e" : "#1e293b",
-              color: tab === item.key ? "#0f172a" : "#e2e8f0",
-              fontWeight: 600,
-            }}
-          >
-            {item.label}
-          </button>
+      {/* ADD NEW TASK */}
+      <div className="add-section">
+        <input
+          type="text"
+          className="add-input"
+          placeholder="새로운 수련 항목을 입력하세요..."
+          value={newTaskName}
+          onChange={(e) => setNewTaskName(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && handleAddTodo()}
+        />
+        <button className="add-button" onClick={handleAddTodo}>추가</button>
+      </div>
+
+      {/* TASK LIST */}
+      <div className="task-list">
+        {dList.map((item, index) => (
+          <div key={item.idx} className={`task-card ${item.completed ? 'completed' : ''}`}>
+            <input
+              type="checkbox"
+              className="checkbox"
+              checked={item.completed}
+              onChange={() => !item.completed && checkList(index)}
+              disabled={item.completed}
+            />
+            <input
+              type="text"
+              className={`task-title-input ${item.completed ? 'strikethrough' : ''}`}
+              value={item.todo}
+              onChange={(e) => handleUpdateTodoText(index, e.target.value)}
+              disabled={item.completed}
+            />
+            <span 
+              className="delete-icon" 
+              onClick={() => handleDeleteTodo(index)}
+              title="삭제"
+            >
+              🗑️
+            </span>
+          </div>
         ))}
       </div>
-
-      {/* LIST */}
-      <div style={{ marginBottom: "16px" }}>
-        <div
-          style={{
-            fontSize: "14px",
-            marginBottom: "8px",
-            fontWeight: 600,
-          }}
-        >
-          {tab.toUpperCase()}
-        </div>
-
-        <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-          {mockData[tab].map((item, idx) => (
-            <div
-              key={idx}
-              onClick={() => setSelected(item)}
-              style={{
-                background: "#1e293b",
-                padding: "12px",
-                borderRadius: "12px",
-                cursor: "pointer",
-                border:
-                  selected === item
-                    ? "1px solid #22c55e"
-                    : "1px solid transparent",
-              }}
-            >
-              {item}
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* DETAIL */}
-      {selected && (
-        <div
-          style={{
-            background: "#1e293b",
-            padding: "16px",
-            borderRadius: "16px",
-            boxShadow: "0 4px 12px rgba(0,0,0,0.3)",
-          }}
-        >
-          <div style={{ fontWeight: 600, marginBottom: "8px" }}>
-            {selected}
-          </div>
-
-          <div style={{ fontSize: "12px", opacity: 0.7, marginBottom: "8px" }}>
-            반복: 주 3회
-          </div>
-
-          <div style={{ fontSize: "12px", opacity: 0.7, marginBottom: "12px" }}>
-            카테고리: Study · EXP +10
-          </div>
-
-          <button
-            style={{
-              width: "100%",
-              padding: "10px",
-              borderRadius: "10px",
-              border: "none",
-              background: "#22c55e",
-              color: "#0f172a",
-              fontWeight: 600,
-              cursor: "pointer",
-            }}
-          >
-            완료
-          </button>
-        </div>
-      )}
     </div>
   );
 };
