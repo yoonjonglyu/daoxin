@@ -1,10 +1,10 @@
 import React from 'react';
-import useDaoxin from '../../hooks/useDaoxin';
+import useSchedule from '../../hooks/useSchedule';
 
 const DaoXinTodo: React.FC = () => {
-  const { dList, checkList } = useDaoxin();
+  const { habitSchedules, completeSchedule } = useSchedule();
   
-  if (dList.length === 0) {
+  if (habitSchedules.length === 0) {
     return (
       <div className="empty-state">
         <span className="empty-icon">📜</span>
@@ -16,19 +16,19 @@ const DaoXinTodo: React.FC = () => {
 
   return (
     <div className='item-list'>
-      {dList.map((item) => (
-        <div key={item.idx} className='item-card'>
+      {habitSchedules.map((item) => (
+        <div key={item.id} className='item-card'>
           <span style={{ 
             textDecoration: item.completed ? 'line-through' : 'none',
             opacity: item.completed ? 0.6 : 1 
           }}>
-            {item.todo}
+            {item.config.name}
           </span>
           <input 
             type='checkbox' 
             className='habit-checkbox' 
             checked={item.completed}
-            onChange={() => !item.completed && checkList(item.idx)}
+            onChange={() => completeSchedule(item.id)}
             disabled={item.completed}
           />
         </div>

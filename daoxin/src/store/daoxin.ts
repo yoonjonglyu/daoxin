@@ -1,27 +1,12 @@
 import { atom } from 'jotai';
+import type { Daoxin } from '../types/daoxin';
 
-export interface DaoXinProps {
-  list: Array<DaoXinListProps>;
-  gauge: number;
-  updateAt: string;
-}
-
-export type DaoXinListProps = {
-  idx: number;
-  todo: string;
-  completed: boolean;
-  updateAt: string;
-};
-
-export const DaoXin = atom<DaoXinProps>({
-  gauge: 1,
-  list: [],
-  updateAt: '',
+export const DaoXin = atom<Daoxin>({
+  rank: '발심',
+  gauge: 0,
+  level: 1,
+  exp: 0,
+  streak: 0,
+  totalCompleted: 0,
+  updateAt: new Date().toISOString(),
 });
-
-export const DailyList = atom(
-  (get) => get(DaoXin).list,
-  (get, set, value: DaoXinListProps[]) => {
-    set(DaoXin, { ...get(DaoXin), list: value });
-  },
-);

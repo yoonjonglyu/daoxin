@@ -1,16 +1,20 @@
 import type { FC } from "react";
 import { useState, useEffect } from "react";
 import useSchedule from "../../hooks/useSchedule";
+import useCategory from "../../hooks/useCategory";
 import type { Schedule, ScheduleCategory } from "../../types/schedule";
 import "./schedule.css";
 
 const SchedulePage: FC = () => {
   const { schedules, addSchedule, editSchedule, deleteSchedule, completeSchedule, initSchedules } = useSchedule();
+  const { categories, initCategories } = useCategory();
   const [newTaskName, setNewTaskName] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<ScheduleCategory>('habit');
+  const [selectedUserCategoryId, setSelectedUserCategoryId] = useState<string>("");
 
   useEffect(() => {
     initSchedules();
+    initCategories();
   }, []);
 
   const handleAddSchedule = () => {
@@ -36,11 +40,13 @@ const SchedulePage: FC = () => {
       scheduleCategory: selectedCategory,
       type: 'daily',
       completed: false,
+      categoryId: selectedUserCategoryId || undefined,
       config
     };
     
     addSchedule(newSchedule);
     setNewTaskName("");
+    setSelectedUserCategoryId("");
   };
 
   const handleUpdateName = (id: string, newName: string) => {
@@ -75,6 +81,18 @@ const SchedulePage: FC = () => {
         ))}
       </div>
 
+      {/* USER CATEGORY DROPDOWN */}
+      <select 
+        className="user-category-select"
+        value={selectedUserCategoryId}
+        onChange={(e) => setSelectedUserCategoryId(e.target.value)}
+      >
+        <option value="">분류 선택 안함 (기본)</option>
+        {categories.map(cat => (
+          <option key={cat.id} value={cat.id}>{cat.name}</option>
+        ))}
+      </select>
+
       <div className="add-section">
         <input
           type="text"
@@ -98,6 +116,11 @@ const SchedulePage: FC = () => {
               onChange={() => completeSchedule(item.id)}
             />
             <span className={`cat-badge ${item.scheduleCategory}`}>{item.scheduleCategory}</span>
+            {item.categoryId && (
+              <span className="user-cat-badge">
+                {categories.find(c => c.id === item.categoryId)?.name || '기타'}
+              </span>
+            )}
             <input
               type="text"
               className={`task-title-input ${item.completed ? 'strikethrough' : ''}`}

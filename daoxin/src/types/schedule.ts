@@ -8,7 +8,7 @@ export interface Schedule {
   startDate?: string;
   endDate?: string;
 
-  config: IntervalConfig | GoalConfig | PeriodicConfig | habitConfig;
+  config: IntervalConfig | GoalConfig | PeriodicConfig | HabitConfig;
 }
 
 export type ScheduleCategory =
@@ -54,7 +54,7 @@ export interface PeriodicConfig extends BasicConfig {
 
   lastResetAt: string;
 }
-export interface habitConfig extends BasicConfig {
+export interface HabitConfig extends BasicConfig {
   lastExecutedAt?: string;
   count: number;
 }

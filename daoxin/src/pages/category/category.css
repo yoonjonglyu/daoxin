@@ -92,6 +92,40 @@
   margin-bottom: 24px;
 }
 
+.category-container .add-cat-section {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.category-container .add-cat-input {
+  flex: 1;
+  background-color: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 12px;
+  padding: 10px 14px;
+  color: #e2e8f0;
+  font-size: 13px;
+  outline: none;
+}
+
+.category-container .add-cat-button {
+  background-color: #334155;
+  color: #e2e8f0;
+  border: none;
+  border-radius: 12px;
+  padding: 0 16px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.category-container .category-card-name-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .category-container .category-card {
   background: #1e293b;
   padding: 16px;
@@ -113,6 +147,20 @@
 
 .category-container .category-card-name {
   font-weight: 600;
+}
+
+.category-container .delete-cat-btn {
+  background: none;
+  border: none;
+  color: #ef4444;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 0;
+  opacity: 0.5;
+}
+
+.category-container .delete-cat-btn:hover {
+  opacity: 1;
 }
 
 .category-container .category-card-status {

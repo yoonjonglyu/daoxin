@@ -4,6 +4,7 @@ import './DaoxinGraph.css';
 import CGraph from '../../components/cgraph/CGraph';
 
 import useDaoxin from '../../hooks/useDaoxin';
+import useSchedule from '../../hooks/useSchedule';
 
 /**
  * @description
@@ -18,10 +19,11 @@ export interface DaoXinGraphProps {}
 
 const DaoXinGraph: React.FC<DaoXinGraphProps> = () => {
   const { dao } = useDaoxin();
+  const { schedules } = useSchedule();
 
   const [isFeedback, setIsFeedback] = useState(false);
   // 완료된 수련 항목의 개수를 계산하여 체크 액션을 감지합니다.
-  const completedCount = dao.list.filter((item: any) => item.completed).length;
+  const completedCount = schedules.filter((item) => item.completed).length;
   const prevCount = useRef(completedCount);
 
   useEffect(() => {

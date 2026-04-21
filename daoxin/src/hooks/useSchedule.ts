@@ -13,7 +13,7 @@ import {
   setLocalStorage,
   getLocalStorage,
 } from 'isa-util';
-import { SALT } from '../value';
+import { SALT, DAOXIN_DEFAULT_SCHEDULES } from '../value';
 
 const SCHEDULE_STORAGE_KEY = 'DAOXIN_SCHEDULE_LIST';
 
@@ -39,7 +39,11 @@ const useSchedule = () => {
 
   const initSchedules = async () => {
     const storedData = getLocalStorage<any>(SCHEDULE_STORAGE_KEY);
-    if (!storedData) return;
+    if (!storedData) {
+      await _saveData(DAOXIN_DEFAULT_SCHEDULES);
+      setSchedules(DAOXIN_DEFAULT_SCHEDULES);
+      return;
+    }
 
     try {
       const decrypted = await decryptData(

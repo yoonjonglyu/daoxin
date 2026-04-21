@@ -1,37 +1,85 @@
 import type { FC } from "react";
-import { useState, useMemo } from "react";
+import { useMemo, useEffect, useState } from "react";
 import "./category.css";
 
 import useDaoxin from "../../hooks/useDaoxin";
+import useCategory from "../../hooks/useCategory";
+import useSchedule from "../../hooks/useSchedule";
 import { MAX_GAUGE } from "../../value";
+import type { Category } from "../../types/category";
 
 
 const CategoryPage: FC = () => {
   const { dao } = useDaoxin();
-  const [selected, setSelected] = useState<string | null>(null);
+  const { categories, selectedCategoryName, initCategories, selectCategoryByName, addCategory, deleteCategory } = useCategory();
+  const { schedules, initSchedules } = useSchedule();
+  const [newCatName, setNewCatName] = useState("");
 
-  // 데이터를 카테고리별로 그룹화하고 통계 계산
+  const handleAddCategory = () => {
+    if (!newCatName.trim()) return;
+    if (categories.some(c => c.name === newCatName.trim())) {
+      alert("이미 존재하는 카테고리 이름입니다.");
+      return;
+    }
+    addCategory({
+      id: Date.now().toString(),
+      name: newCatName.trim()
+    });
+    setNewCatName("");
+  };
+
+  useEffect(() => {
+    initCategories();
+    initSchedules();
+  }, []);
+
+  // 스케줄 데이터를 기반으로 카테고리별 통계 계산
   const categoryStats = useMemo(() => {
-    const stats: Record<string, { name: string; total: number; completed: number; items: typeof dao.list }> = {};
+    const statsMap = new Map<string, (Category & {
+      total: number;
+      completed: number;
+      items: Array<{ id: string; todo: string; completed: boolean }>;
+    })>();
+
+    // 1. 등록된 카테고리 기본 구조 생성
+    categories.forEach(cat => {
+      statsMap.set(cat.name, {
+        ...cat,
+        total: 0,
+        completed: 0,
+        items: []
+      });
+    });
     
-    dao.list.forEach((item) => {
-      const cat = item.category || "기타";
-      if (!stats[cat]) {
-        stats[cat] = { name: cat, total: 0, completed: 0, items: [] };
+    // 2. 스케줄 항목들을 해당 카테고리에 할당 및 통계 합산
+    schedules.forEach((s) => {
+      const categoryObj = categories.find(c => c.id === s.categoryId);
+      const catName = categoryObj ? categoryObj.name : "기타";
+
+      let currentStats = statsMap.get(catName);
+      if (!currentStats) {
+        currentStats = { id: `auto-${catName}`, name: catName, total: 0, completed: 0, items: [] };
+        statsMap.set(catName, currentStats);
       }
-      stats[cat].total += 1;
-      if (item.completed) stats[cat].completed += 1;
-      stats[cat].items.push(item);
+
+      currentStats.total += 1;
+      if (s.completed) currentStats.completed += 1;
+      currentStats.items.push({
+        id: `sched-${s.id}`,
+        todo: s.config.name,
+        completed: s.completed
+      });
     });
 
-    return Object.values(stats);
-  }, [dao.list]);
+    // 3. 이름순 정렬
+    return Array.from(statsMap.values()).sort((a, b) => a.name.localeCompare(b.name));
+  }, [categories, schedules]);
 
-  const totalTasks = dao.list.length;
-  const completedTasks = dao.list.filter(t => t.completed).length;
+  const totalTasks = schedules.length;
+  const completedTasks = schedules.filter(s => s.completed).length;
   const totalProgress = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
 
-  const current = categoryStats.find((c) => c.name === selected);
+  const currentDetail = categoryStats.find((c) => c.name === selectedCategoryName);
 
   return (
     <div className="category-container">
@@ -67,21 +115,46 @@ const CategoryPage: FC = () => {
         </div>
       </div>
 
+      {/* CATEGORY MANAGEMENT (ADD) */}
+      <div className="section-title">카테고리 관리</div>
+      <div className="add-cat-section">
+        <input
+          type="text"
+          className="add-cat-input"
+          placeholder="새 카테고리 이름..."
+          value={newCatName}
+          onChange={(e) => setNewCatName(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && handleAddCategory()}
+        />
+        <button className="add-cat-button" onClick={handleAddCategory}>추가</button>
+      </div>
+
       {/* CATEGORY PROGRESS LIST */}
-      <div className="section-title">카테고리별 진행도</div>
+      <div className="section-title">진행도 및 통계</div>
       <div className="category-list">
         {categoryStats.map((cat) => {
           const progress = Math.round((cat.completed / cat.total) * 100);
           return (
             <div
               key={cat.name}
-              onClick={() => setSelected(cat.name)}
-              className={`category-card ${selected === cat.name ? "active" : ""}`}
+              onClick={() => selectCategoryByName(cat.name)}
+              className={`category-card ${selectedCategoryName === cat.name ? "active" : ""}`}
             >
               <div className="category-card-header">
-                <span className="category-card-name">{cat.name}</span>
+                <div className="category-card-name-wrapper">
+                  <span className="category-card-name">{cat.name}</span>
+                  <button 
+                    className="delete-cat-btn"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if(confirm(`'${cat.name}' 카테고리를 삭제하시겠습니까?`)) deleteCategory(cat.id);
+                    }}
+                  >
+                    ✕
+                  </button>
+                </div>
                 <span className={`category-card-status ${progress === 100 ? "completed" : ""}`}>
-                  {cat.completed}/{cat.total} ({progress}%)
+                  {cat.completed}/{cat.total} ({isNaN(progress) ? 0 : progress}%)
                 </span>
               </div>
               <div className="progress-bar-container">
@@ -96,20 +169,20 @@ const CategoryPage: FC = () => {
       </div>
 
       {/* CATEGORY DETAIL (TASK LIST) */}
-      {current && (
+      {currentDetail && (
         <div className="category-detail">
-          <div className="detail-name">{current.name}</div>
+          <div className="detail-name">{currentDetail.name}</div>
           <div className="detail-stats">
-            완료된 항목: {current.completed} / {current.total}
+            완료된 항목: {currentDetail.completed} / {currentDetail.total}
           </div>
           <div className="section-title">수행 목록</div>
           <div className="task-list">
-            {current.items.map((item, idx) => (
+            {currentDetail.items.map((item, idx) => (
               <div
                 key={idx}
                 className={`task-item ${item.completed ? "completed" : ""}`}
               >
-                <span>{item.title}</span>
+                <span>{item.todo}</span>
                 {item.completed && <span className="check-icon">✓</span>}
               </div>
             ))}

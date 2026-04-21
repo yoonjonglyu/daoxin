@@ -39,7 +39,6 @@ const MainPage: FC = () => {
 
       {/* SCHEDULE */}
       <section className='content-section'>
-        <h3 className='section-title'>📅 세부 일정</h3>
         <DaoXinSchedule />
       </section>
     </div>
