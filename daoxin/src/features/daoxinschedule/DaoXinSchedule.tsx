@@ -1,7 +1,7 @@
 import { type FC, useEffect, useMemo } from 'react';
 import useSchedule from '../../hooks/useSchedule';
 import { getIntervalRemainingDays } from '../../utils/date';
-import type { GoalConfig, IntervalConfig, PeriodicConfig, Schedule } from '../../types/schedule';
+import type { GoalConfig, IntervalConfig, PeriodicConfig } from '../../types/schedule';
 
 const DaoXinSchedule: FC = () => {
   const {
