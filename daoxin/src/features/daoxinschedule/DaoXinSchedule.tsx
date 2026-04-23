@@ -1,11 +1,11 @@
-import { type FC, useEffect } from 'react';
+import { type FC, useEffect, useMemo } from 'react';
 import useSchedule from '../../hooks/useSchedule';
+import { getIntervalRemainingDays } from '../../utils/date';
+import type { GoalConfig, IntervalConfig, PeriodicConfig, Schedule } from '../../types/schedule';
 
 const DaoXinSchedule: FC = () => {
   const {
-    intervalSchedules,
-    goalSchedules,
-    periodicSchedules,
+    schedules,
     completeSchedule,
     initSchedules,
   } = useSchedule();
@@ -14,15 +14,20 @@ const DaoXinSchedule: FC = () => {
     initSchedules();
   }, []);
 
-  const hasAnySchedule = intervalSchedules.length > 0 || goalSchedules.length > 0 || periodicSchedules.length > 0;
+  // 스케줄을 타입별로 그룹화 (habit 제외, 빈 그룹 제외)
+  const sections = useMemo(() => [
+    { name: 'goal', title: '🎯 목표 달성', items: schedules.filter((s) => s.scheduleCategory === 'goal') },
+    { name: 'interval', title: '⏳ 간격 수련', items: schedules.filter((s) => s.scheduleCategory === 'interval') },
+    { name: 'periodic', title: '🔄 주기 정진', items: schedules.filter((s) => s.scheduleCategory === 'periodic') },
+  ].filter(section => section.items.length > 0), [schedules]);
 
-  if (!hasAnySchedule) {
+  if (sections.length === 0) {
     return (
       <div className='empty-state'>
         <span className='empty-icon'>📅</span>
-        <p className='empty-text'>예정된 일정이 없습니다.</p>
+        <p className='empty-text'>정진할 일정이 없습니다.</p>
         <p className='empty-subtext'>
-          스케줄 메뉴에서 새로운 일정을 계획해 보세요.
+          수련 일정 관리에서 새로운 목표를 세워보세요.
         </p>
       </div>
     );
@@ -30,56 +35,62 @@ const DaoXinSchedule: FC = () => {
 
   return (
     <div className='schedule-groups'>
-      {/* 1. 목표 달성형 (Goal) */}
-      {goalSchedules.length > 0 && (
-        <div className='schedule-group'>
-          <h4 className='group-title'>🎯 목표 달성</h4>
+      {sections.map((section) => (
+        <div key={section.name} className='schedule-group'>
+          <h4 className='group-title'>{section.title}</h4>
           <div className='item-list'>
-            {goalSchedules.map((item) => (
-              <div key={item.id} className='item-card cat-goal'>
-                <span>{item.config.name}</span>
-                <button className='complete-btn' onClick={() => completeSchedule(item.id)}>
-                  {item.completed ? '취소' : '완료'}
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+            {section.items.map((item) => {
+              const isGoal = item.scheduleCategory === 'goal';
+              const isInterval = item.scheduleCategory === 'interval';
+              const isPeriodic = item.scheduleCategory === 'periodic';
 
-      {/* 2. 간격 기반 (Interval) */}
-      {intervalSchedules.length > 0 && (
-        <div className='schedule-group'>
-          <h4 className='group-title'>⏳ 간격 수련</h4>
-          <div className='item-list'>
-            {intervalSchedules.map((item) => (
-              <div key={item.id} className='item-card cat-interval'>
-                <span>{item.config.name}</span>
-                <button className='complete-btn' onClick={() => completeSchedule(item.id)}>
-                  {item.completed ? '취소' : '완료'}
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+              return (
+                <div 
+                  key={item.id} 
+                  className={`item-card cat-${item.scheduleCategory} ${item.completed ? 'completed' : ''}`}
+                >
+                  <div className='item-info'>
+                    <span className='item-name'>{item.config.name}</span>
+                    
+                    {/* 타입별 상세 상태 표시 */}
+                    {isGoal && (
+                      <span className='item-desc'>
+                        {(item.config as GoalConfig).currentCount} / {(item.config as GoalConfig).targetCount}
+                      </span>
+                    )}
+                    {isPeriodic && (
+                      <span className='item-desc'>
+                        이번 주기: {(item.config as PeriodicConfig).periodCount}회
+                      </span>
+                    )}
+                    {isInterval && item.completed && (item.config as IntervalConfig).lastExecutedAt && (
+                      <span className='item-desc'>
+                        D-{getIntervalRemainingDays(
+                          (item.config as IntervalConfig).lastExecutedAt!,
+                          (item.config as IntervalConfig).intervalDays
+                        )}일 후 가능
+                      </span>
+                    )}
+                  </div>
 
-      {/* 3. 주기 리셋형 (Periodic) */}
-      {periodicSchedules.length > 0 && (
-        <div className='schedule-group'>
-          <h4 className='group-title'>🔄 주기 정진</h4>
-          <div className='item-list'>
-            {periodicSchedules.map((item) => (
-              <div key={item.id} className='item-card cat-periodic'>
-                <span>{item.config.name}</span>
-                <button className='complete-btn' onClick={() => completeSchedule(item.id)}>
-                  {item.completed ? '취소' : '완료'}
-                </button>
-              </div>
-            ))}
+                  <button 
+                    className='complete-btn' 
+                    onClick={() => completeSchedule(item.id)}
+                    disabled={
+                      item.completed && (
+                        isInterval || 
+                        (isGoal && (item.config as GoalConfig).isCompleted)
+                      )
+                    }
+                  >
+                    {isPeriodic ? '+1' : (item.completed ? '✓' : (isGoal ? '+1' : '완료'))}
+                  </button>
+                </div>
+              );
+            })}
           </div>
         </div>
-      )}
+      ))}
     </div>
   );
 };

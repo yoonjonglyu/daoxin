@@ -1,5 +1,7 @@
 import { useAtom, useAtomValue } from 'jotai';
-import type { Schedule } from '../types/schedule';
+import type {
+  Schedule,
+} from '../types/schedule';
 import {
   ScheduleList,
   HabitSchedules,
@@ -7,13 +9,10 @@ import {
   IntervalSchedules,
   PeriodicSchedules,
 } from '../store/schedule';
-import {
-  decryptData,
-  encryptData,
-  setLocalStorage,
-  getLocalStorage,
-} from 'isa-util';
-import { SALT, DAOXIN_DEFAULT_SCHEDULES } from '../value';
+import { DAOXIN_DEFAULT_SCHEDULES, TODAY } from '../value';
+import { saveEncryptedData, loadEncryptedData } from '../utils/storage';
+import { calculateScheduleCompletion, refreshScheduleStatus } from '../services/scheduleService';
+import { calculateNextPeriod } from '../utils/date';
 
 const SCHEDULE_STORAGE_KEY = 'DAOXIN_SCHEDULE_LIST';
 
@@ -24,46 +23,25 @@ const useSchedule = () => {
   const intervalSchedules = useAtomValue(IntervalSchedules);
   const periodicSchedules = useAtomValue(PeriodicSchedules);
 
-  const _saveData = async (list: Schedule[]) => {
-    try {
-      const encryptedValue = await encryptData(
-        JSON.stringify(list),
-        SALT,
-        SALT,
-      );
-      setLocalStorage(SCHEDULE_STORAGE_KEY, encryptedValue);
-    } catch (error) {
-      console.error('스케줄 저장 중 오류 발생:', error);
-    }
-  };
-
   const initSchedules = async () => {
-    const storedData = getLocalStorage<any>(SCHEDULE_STORAGE_KEY);
-    if (!storedData) {
-      await _saveData(DAOXIN_DEFAULT_SCHEDULES);
-      setSchedules(DAOXIN_DEFAULT_SCHEDULES);
-      return;
-    }
+    const data = await loadEncryptedData<Schedule[]>(SCHEDULE_STORAGE_KEY);
+    let list = data || DAOXIN_DEFAULT_SCHEDULES;
 
-    try {
-      const decrypted = await decryptData(
-        storedData.encryptedData,
-        storedData.iv,
-        SALT,
-        SALT,
-      );
-      setSchedules(JSON.parse(decrypted));
-    } catch (error) {
-      console.error('스케줄 로드 중 오류 발생:', error);
-    }
+    // 각 스케줄의 주기/날짜 기반 상태 갱신
+    const refreshedList = list.map(s => refreshScheduleStatus(s));
+    
+    // 변경사항이 있거나 신규 데이터인 경우 저장
+    await saveEncryptedData(SCHEDULE_STORAGE_KEY, refreshedList);
+    setSchedules(refreshedList);
   };
 
   const completeSchedule = (id: string) => {
     const next = schedules.map((s) =>
-      s.id === id ? { ...s, completed: !s.completed } : s,
+      s.id === id ? calculateScheduleCompletion(s) : s
     );
+
     setSchedules(next);
-    _saveData(next);
+    saveEncryptedData(SCHEDULE_STORAGE_KEY, next);
   };
 
   const editSchedule = (id: string, updatedFields: Partial<Schedule>) => {
@@ -71,19 +49,68 @@ const useSchedule = () => {
       s.id === id ? { ...s, ...updatedFields } : s,
     );
     setSchedules(next);
-    _saveData(next);
+    saveEncryptedData(SCHEDULE_STORAGE_KEY, next);
   };
 
   const deleteSchedule = (id: string) => {
     const next = schedules.filter((s) => s.id !== id);
     setSchedules(next);
-    _saveData(next);
+    saveEncryptedData(SCHEDULE_STORAGE_KEY, next);
   };
 
-  const addSchedule = (newSchedule: Schedule) => {
+  const addSchedule = ({
+    newTaskName,
+    selectedCategory,
+    type,
+    selectedUserCategoryId,
+    goalTarget,
+    intervalDays,
+  }: {
+    newTaskName: string;
+    selectedCategory: Schedule['scheduleCategory'];
+    type: Schedule['type'];
+    selectedUserCategoryId?: string;
+    goalTarget?: number;
+    intervalDays?: number;
+  }) => {
+    let config: Schedule['config'];
+    const base = { name: newTaskName };
+
+    // 카테고리에 따른 필수 데이터 초기화
+    if (selectedCategory === 'habit') {
+      config = { ...base, count: 0 };
+    } else if (selectedCategory === 'goal') {
+      config = { ...base, targetCount: goalTarget || 1, currentCount: 0, isCompleted: false };
+    } else if (selectedCategory === 'interval') {
+      config = { ...base, intervalDays: intervalDays || 1, totalCount: 0 };
+    } else {
+      // periodic: 추가 시점 기준 첫 주기 계산
+      // 어제가 종료일이었다고 가정하고 오늘부터 시작되는 주기를 계산함
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      const initialRange = calculateNextPeriod(yesterday.toISOString(), type);
+
+      config = {
+        ...base,
+        periodStart: initialRange.start,
+        periodEnd: initialRange.end,
+        periodCount: 0,
+        totalCount: 0,
+        lastResetAt: TODAY,
+      };
+    }
+
+    const newSchedule: Schedule = {
+      id: Date.now().toString(),
+      scheduleCategory: selectedCategory,
+      type: type,
+      completed: false,
+      categoryId: selectedUserCategoryId || undefined,
+      config,
+    };
     const next = [...schedules, newSchedule];
     setSchedules(next);
-    _saveData(next);
+    saveEncryptedData(SCHEDULE_STORAGE_KEY, next);
   };
 
   return {
