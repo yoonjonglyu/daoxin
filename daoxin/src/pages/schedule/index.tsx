@@ -80,7 +80,7 @@ const SchedulePage: FC = () => {
     );
 
     if (uncategorizedItems.length > 0) {
-      groups.push({ categoryName: '기타/미분류', items: uncategorizedItems });
+      groups.push({ categoryName: 'Other', items: uncategorizedItems });
     }
 
     return groups;

@@ -6,29 +6,32 @@ import DaoXinGraph from '../../features/daoxingraph/DaoxinGraph';
 import DaoXinTodo from '../../features/daoxintodo/DaoXinTodo';
 import DaoXinSchedule from '../../features/daoxinschedule/DaoXinSchedule';
 import useDaoxin from '../../hooks/useDaoxin';
+import { MAX_GAUGE } from '../../value';
 
 const MainPage: FC = () => {
   const { dao } = useDaoxin();
   const gauge = dao.gauge;
 
-  const getStageClass = (val: number) => {
-    if (val >= 77) return 'stage-cheon-gyo'; // 천교 (Gold)
-    if (val >= 50) return 'stage-eung-sim'; // 응심 (Purple)
-    if (val >= 25) return 'stage-seung-hwa'; // 승화
-    return 'stage-bal-sim'; // 발심
+  const getRankInfo = (val: number) => {
+    if (val >= 77) return { class: 'stage-cheon-gyo', name: '천교(天敎)' };
+    if (val >= 50) return { class: 'stage-eung-sim', name: '응심(凝心)' };
+    if (val >= 25) return { class: 'stage-seung-hwa', name: '승화(昇華)' };
+    return { class: 'stage-bal-sim', name: '발심(發心)' };
   };
+
+  const rankInfo = getRankInfo(gauge);
 
   return (
     <div className='main-container'>
       {/* STATUS */}
-      <section className={`status-section ${getStageClass(gauge)}`}>
+      <section className={`status-section ${rankInfo.class}`}>
         <span className='status-label'>현재 경지</span>
-        <h2 className='status-title'>수행자 Lv.3</h2>
+        <h2 className='status-title'>{rankInfo.name} Lv.{dao.level}</h2>
         <DaoXinGraph />
         <div className='progress-bar'>
-          <div className='progress-fill' style={{ width: `${gauge}%` }} />
+          <div className='progress-fill' style={{ width: `${(gauge / MAX_GAUGE) * 100}%` }} />
         </div>
-        <p className='status-stats'>도심 {gauge / 10} / 10 · 🔥 5일 연속</p>
+        <p className='status-stats'>누적 경험치 {dao.exp} EXP · 🔥 {dao.streak}일 연속 정진 중</p>
       </section>
 
       {/* HABIT */}

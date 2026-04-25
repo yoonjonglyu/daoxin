@@ -1,13 +1,14 @@
 import type { FC } from "react";
 import { useMemo, useEffect, useState } from "react";
 import "./category.css";
+import type { Category } from "../../types/category";
 
 import useDaoxin from "../../hooks/useDaoxin";
 import useCategory from "../../hooks/useCategory";
 import useSchedule from "../../hooks/useSchedule";
-import { MAX_GAUGE } from "../../value";
-import type { Category } from "../../types/category";
 
+import { getCategoryLevelInfo, getCategoryRank, getCategoryRankClass } from "../../services/categoryService";
+import { MAX_GAUGE } from "../../value";
 
 const CategoryPage: FC = () => {
   const { dao } = useDaoxin();
@@ -23,7 +24,8 @@ const CategoryPage: FC = () => {
     }
     addCategory({
       id: Date.now().toString(),
-      name: newCatName.trim()
+      name: newCatName.trim(),
+      exp: 0,
     });
     setNewCatName("");
   };
@@ -58,7 +60,7 @@ const CategoryPage: FC = () => {
 
       let currentStats = statsMap.get(catName);
       if (!currentStats) {
-        currentStats = { id: `auto-${catName}`, name: catName, total: 0, completed: 0, items: [] };
+        currentStats = { id: `auto-${catName}`, name: catName, total: 0, completed: 0, items: [], exp: 0 };
         statsMap.set(catName, currentStats);
       }
 
@@ -80,6 +82,8 @@ const CategoryPage: FC = () => {
   const totalProgress = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
 
   const currentDetail = categoryStats.find((c) => c.name === selectedCategoryName);
+  const detailLevel = currentDetail ? getCategoryLevelInfo(currentDetail.exp) : null;
+  const detailRankClass = detailLevel ? getCategoryRankClass(detailLevel.level) : "";
 
   return (
     <div className="category-container">
@@ -133,12 +137,15 @@ const CategoryPage: FC = () => {
       <div className="section-title">진행도 및 통계</div>
       <div className="category-list">
         {categoryStats.map((cat) => {
-          const progress = Math.round((cat.completed / cat.total) * 100);
+          const levelInfo = getCategoryLevelInfo(cat.exp);
+          const rank = getCategoryRank(levelInfo.level);
+          const rankClass = getCategoryRankClass(levelInfo.level);
+
           return (
             <div
               key={cat.name}
               onClick={() => selectCategoryByName(cat.name)}
-              className={`category-card ${selectedCategoryName === cat.name ? "active" : ""}`}
+              className={`category-card ${selectedCategoryName === cat.name ? "active" : ""} ${rankClass}`}
             >
               <div className="category-card-header">
                 <div className="category-card-name-wrapper">
@@ -153,14 +160,14 @@ const CategoryPage: FC = () => {
                     ✕
                   </button>
                 </div>
-                <span className={`category-card-status ${progress === 100 ? "completed" : ""}`}>
-                  {cat.completed}/{cat.total} ({isNaN(progress) ? 0 : progress}%)
+                <span className="category-card-status">
+                  Lv.{levelInfo.level} {rank} ({Math.floor(levelInfo.progress)}%)
                 </span>
               </div>
               <div className="progress-bar-container">
                 <div
-                  className={`progress-bar-fill ${progress === 100 ? "full" : ""}`}
-                  style={{ width: `${progress}%` }}
+                  className={`progress-bar-fill ${rankClass}`}
+                  style={{ width: `${levelInfo.progress}%` }}
                 />
               </div>
             </div>
@@ -169,11 +176,11 @@ const CategoryPage: FC = () => {
       </div>
 
       {/* CATEGORY DETAIL (TASK LIST) */}
-      {currentDetail && (
-        <div className="category-detail">
-          <div className="detail-name">{currentDetail.name}</div>
+      {currentDetail && detailLevel && (
+        <div className={`category-detail ${detailRankClass}`}>
+          <div className="detail-name">{currentDetail.name} <span className={`detail-lv-badge ${detailRankClass}`}>Lv.{detailLevel.level}</span></div>
           <div className="detail-stats">
-            완료된 항목: {currentDetail.completed} / {currentDetail.total}
+            {getCategoryRank(detailLevel.level)} (누적 경험치: {currentDetail.exp}) | 오늘 완료: {currentDetail.completed} / {currentDetail.total}
           </div>
           <div className="section-title">수행 목록</div>
           <div className="task-list">

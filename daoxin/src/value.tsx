@@ -8,7 +8,8 @@ export const MIN_GAUGE = 1;
 export const MAX_GAUGE = 78;
 const now = new Date();
 export const TODAY = `${now.getFullYear()}/${String(now.getMonth()+1).padStart(2,'0')}/${String(now.getDate()).padStart(2,'0')}`;
-
+export const SCHEDULE_STORAGE_KEY = 'DAOXIN_SCHEDULE_LIST';
+export const CATEGORY_STORAGE_KEY = 'DAOXIN_CATEGORY_LIST';
 export const DAOXIN_DEFAULT: Daoxin = {
   rank: '발심',
   gauge: 1,
@@ -20,9 +21,9 @@ export const DAOXIN_DEFAULT: Daoxin = {
 };
 
 export const DAOXIN_DEFAULT_CATEGORYS: Category[] = [
-  { id: 'cat-1', name: '신체 수련', description: '강건한 육신을 위한 정진' },
-  { id: 'cat-2', name: '심신 안정', description: '맑은 정신과 도심을 닦는 행위' },
-  { id: 'cat-3', name: '지식 정진', description: '세상의 이치를 깨닫는 공부' },
+  { id: 'cat-1', name: '신체 수련', description: '강건한 육신을 위한 정진', exp: 0 },
+  { id: 'cat-2', name: '심신 안정', description: '맑은 정신과 도심을 닦는 행위', exp: 0 },
+  { id: 'cat-3', name: '지식 정진', description: '세상의 이치를 깨닫는 공부', exp: 0 },
 ];
 
 export const DAOXIN_DEFAULT_SCHEDULES: Schedule[] = [

@@ -9,12 +9,16 @@ import {
   IntervalSchedules,
   PeriodicSchedules,
 } from '../store/schedule';
-import { DAOXIN_DEFAULT_SCHEDULES, TODAY } from '../value';
-import { saveEncryptedData, loadEncryptedData } from '../utils/storage';
-import { calculateScheduleCompletion, refreshScheduleStatus } from '../services/scheduleService';
-import { calculateNextPeriod } from '../utils/date';
 
-const SCHEDULE_STORAGE_KEY = 'DAOXIN_SCHEDULE_LIST';
+import { saveEncryptedData, loadEncryptedData } from '../utils/storage';
+import { calculateNextPeriod } from '../utils/date';
+import { earnExp, earnGauge, CATEGORY_REWARDS } from '../services/daoxinService';
+import { calculateScheduleCompletion, refreshScheduleStatus } from '../services/scheduleService';
+
+import useDaoxin from './useDaoxin';
+import useCategory from './useCategory';
+
+import { DAOXIN_DEFAULT_SCHEDULES, TODAY, SCHEDULE_STORAGE_KEY } from '../value';
 
 const useSchedule = () => {
   const [schedules, setSchedules] = useAtom(ScheduleList);
@@ -22,6 +26,8 @@ const useSchedule = () => {
   const goalSchedules = useAtomValue(GoalSchedules);
   const intervalSchedules = useAtomValue(IntervalSchedules);
   const periodicSchedules = useAtomValue(PeriodicSchedules);
+  const { dao, updateDao } = useDaoxin();
+  const { addCategoryExp } = useCategory();
 
   const initSchedules = async () => {
     const data = await loadEncryptedData<Schedule[]>(SCHEDULE_STORAGE_KEY);
@@ -36,9 +42,39 @@ const useSchedule = () => {
   };
 
   const completeSchedule = (id: string) => {
-    const next = schedules.map((s) =>
-      s.id === id ? calculateScheduleCompletion(s) : s
-    );
+    const target = schedules.find((s) => s.id === id);
+    if (!target) return;
+
+    const updated = calculateScheduleCompletion(target);
+    if (target === updated && target.scheduleCategory !== 'periodic') return; // 변화가 없으면 종료 (예: 이미 완료된 습관 중복 클릭)
+
+    const next = schedules.map((s) => (s.id === id ? updated : s));
+
+    // 보상 로직 분리
+    const reward = CATEGORY_REWARDS[updated.scheduleCategory];
+    let currentDao = dao;
+
+    // 1. 경험치(Exp): 어떤 스케줄이든 개별 항목이 완료될 때마다 즉시 반영
+    if (target.scheduleCategory === 'periodic' || (!target.completed && updated.completed)) {
+      currentDao = earnExp(currentDao, reward);
+      if (updated.categoryId) addCategoryExp(updated.categoryId, reward);
+    }
+
+    // 2. 게이지(Gauge): 습관(habit) 카테고리의 모든 항목을 마쳤을 때만 상승
+    if (updated.scheduleCategory === 'habit') {
+      const prevHabits = schedules.filter((s) => s.scheduleCategory === 'habit');
+      const nextHabits = next.filter((s) => s.scheduleCategory === 'habit');
+      const wasAllDone = prevHabits.length > 0 && prevHabits.every((h) => h.completed);
+      const isAllDone = nextHabits.length > 0 && nextHabits.every((h) => h.completed);
+
+      if (!wasAllDone && isAllDone) {
+        currentDao = earnGauge(currentDao, reward);
+      }
+    }
+
+    if (currentDao !== dao) {
+      updateDao(currentDao);
+    }
 
     setSchedules(next);
     saveEncryptedData(SCHEDULE_STORAGE_KEY, next);
@@ -78,7 +114,7 @@ const useSchedule = () => {
 
     // 카테고리에 따른 필수 데이터 초기화
     if (selectedCategory === 'habit') {
-      config = { ...base, count: 0 };
+      config = { ...base, count: 0, lastExecutedAt: TODAY };
     } else if (selectedCategory === 'goal') {
       config = { ...base, targetCount: goalTarget || 1, currentCount: 0, isCompleted: false };
     } else if (selectedCategory === 'interval') {
@@ -104,7 +140,7 @@ const useSchedule = () => {
       id: Date.now().toString(),
       scheduleCategory: selectedCategory,
       type: type,
-      completed: false,
+      completed: selectedCategory === 'habit' ? true : false,
       categoryId: selectedUserCategoryId || undefined,
       config,
     };
