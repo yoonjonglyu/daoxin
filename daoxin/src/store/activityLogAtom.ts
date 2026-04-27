@@ -28,3 +28,10 @@ export const weeklyStatsAtom = atom((get) => {
   const logs = get(activityLogsAtom);
   return getWeeklyStats(logs, new Date());
 });
+
+// 이번 달 통계 (파생 아톰)
+export const monthlyStatsAtom = atom((get) => {
+  const logs = get(activityLogsAtom);
+  const date = new Date();
+  return getMonthlyStats(logs, date.getFullYear(), date.getMonth());
+});

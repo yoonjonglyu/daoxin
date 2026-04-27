@@ -13,7 +13,6 @@ import {
   getCategoryRank,
   getCategoryRankClass,
 } from '../../services/categoryService';
-import { getMonthlyStats } from '../../services/statisticsService';
 import { MAX_GAUGE } from '../../value';
 
 const CategoryPage: FC = () => {
@@ -26,7 +25,7 @@ const CategoryPage: FC = () => {
     deleteCategory,
   } = useCategory();
   const { schedules } = useSchedule();
-  const { logs, dailyStats, weeklyStats, initLogs } = useActivityLog();
+  const { dailyStats, weeklyStats, monthlyStats } = useActivityLog();
 
   const [newCatName, setNewCatName] = useState('');
   const [statPeriod, setStatPeriod] = useState<'daily' | 'weekly' | 'monthly'>('daily');
@@ -106,10 +105,7 @@ const CategoryPage: FC = () => {
     totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
 
   // 이번 달 통계 계산 (현재 날짜 기준)
-  const monthlyStats = useMemo(() => {
-    const now = new Date();
-    return getMonthlyStats(logs, now.getFullYear(), now.getMonth());
-  }, [logs]);
+
 
   const activeStats = useMemo(() => {
     if (statPeriod === 'daily') return dailyStats;

@@ -1,5 +1,5 @@
 import { useAtom, useAtomValue } from 'jotai';
-import { activityLogsAtom, dailyStatsAtom, weeklyStatsAtom, totalStatsAtom } from '../store/activityLogAtom';
+import { activityLogsAtom, dailyStatsAtom, weeklyStatsAtom, totalStatsAtom, monthlyStatsAtom } from '../store/activityLogAtom';
 import { ActivityLog } from '../types/activitylog';
 import { saveEncryptedData, loadEncryptedData } from '../utils/storage';
 import { LOG_STORAGE_KEY } from '../value';
@@ -14,7 +14,7 @@ export const useActivityLog = () => {
   const totalStats = useAtomValue(totalStatsAtom);
   const dailyStats = useAtomValue(dailyStatsAtom);
   const weeklyStats = useAtomValue(weeklyStatsAtom);
-
+  const monthlyStats = useAtomValue(monthlyStatsAtom);
   // 초기 데이터 로드
   const initLogs = async () => {
     const savedLogs = await loadEncryptedData<ActivityLog[]>(LOG_STORAGE_KEY);
@@ -45,6 +45,7 @@ export const useActivityLog = () => {
     logs,
     dailyStats,
     weeklyStats,
+    monthlyStats,
     totalStats,
     initLogs,
     addLog,
