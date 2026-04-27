@@ -13,7 +13,7 @@ const BasicLayout: React.FC<BasicLayoutProps> = ({ children }) => {
         {children}
       </main>
       <nav className="bottom-navigation">
-        <a href="/" className="nav-item">
+        <a href="/daoxin/" className="nav-item">
           <span className="nav-icon">🏠</span>
           <span className="nav-label">Main</span>
         </a>

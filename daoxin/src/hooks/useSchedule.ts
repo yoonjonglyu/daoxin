@@ -17,6 +17,7 @@ import { calculateScheduleCompletion, refreshScheduleStatus } from '../services/
 
 import useDaoxin from './useDaoxin';
 import useCategory from './useCategory';
+import useActivityLog from './useActivityLog';
 
 import { DAOXIN_DEFAULT_SCHEDULES, TODAY, SCHEDULE_STORAGE_KEY } from '../value';
 
@@ -27,7 +28,8 @@ const useSchedule = () => {
   const intervalSchedules = useAtomValue(IntervalSchedules);
   const periodicSchedules = useAtomValue(PeriodicSchedules);
   const { dao, updateDao } = useDaoxin();
-  const { addCategoryExp } = useCategory();
+  const { categories, addCategoryExp } = useCategory();
+  const { addLog } = useActivityLog();
 
   const initSchedules = async () => {
     const data = await loadEncryptedData<Schedule[]>(SCHEDULE_STORAGE_KEY);
@@ -53,11 +55,14 @@ const useSchedule = () => {
     // 보상 로직 분리
     const reward = CATEGORY_REWARDS[updated.scheduleCategory];
     let currentDao = dao;
+    let earnedExp = 0;
+    let earnedGauge = 0;
 
     // 1. 경험치(Exp): 어떤 스케줄이든 개별 항목이 완료될 때마다 즉시 반영
     if (target.scheduleCategory === 'periodic' || (!target.completed && updated.completed)) {
       currentDao = earnExp(currentDao, reward);
       if (updated.categoryId) addCategoryExp(updated.categoryId, reward);
+      earnedExp = reward;
     }
 
     // 2. 게이지(Gauge): 습관(habit) 카테고리의 모든 항목을 마쳤을 때만 상승
@@ -69,11 +74,27 @@ const useSchedule = () => {
 
       if (!wasAllDone && isAllDone) {
         currentDao = earnGauge(currentDao, reward);
+        earnedGauge = reward;
       }
     }
 
     if (currentDao !== dao) {
       updateDao(currentDao);
+
+      // 액티비티 로그 저장
+      const category = categories.find(c => c.id === updated.categoryId);
+      addLog({
+        id: Date.now().toString(),
+        daoxinId: 'root', // 시스템 기본 ID
+        scheduleId: updated.id,
+        scheduleName: updated.config.name,
+        categoryId: updated.categoryId,
+        categoryName: category?.name || '기타',
+        scheduleCategory: updated.scheduleCategory,
+        executedAt: new Date().toISOString(),
+        earnedExp,
+        earnedGauge,
+      });
     }
 
     setSchedules(next);

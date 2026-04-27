@@ -10,6 +10,7 @@ const now = new Date();
 export const TODAY = `${now.getFullYear()}/${String(now.getMonth()+1).padStart(2,'0')}/${String(now.getDate()).padStart(2,'0')}`;
 export const SCHEDULE_STORAGE_KEY = 'DAOXIN_SCHEDULE_LIST';
 export const CATEGORY_STORAGE_KEY = 'DAOXIN_CATEGORY_LIST';
+export const LOG_STORAGE_KEY = 'DAOXIN_ACTIVITY_LOGS';
 export const DAOXIN_DEFAULT: Daoxin = {
   rank: '발심',
   gauge: 1,
