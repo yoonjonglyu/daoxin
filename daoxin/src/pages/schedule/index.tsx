@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 
 import './schedule.css';
 
@@ -14,6 +14,13 @@ import useSchedule from '../../hooks/useSchedule';
 import useCategory from '../../hooks/useCategory';
 import { getIntervalRemainingDays } from '../../utils/date';
 
+const categoryLabels: Record<ScheduleCategory, string> = {
+  habit: '상시(常時)',
+  goal: '대업(大業)',
+  interval: '연마(硏磨)',
+  periodic: '순환(循環)',
+};
+
 const SchedulePage: FC = () => {
   const {
     schedules,
@@ -21,9 +28,8 @@ const SchedulePage: FC = () => {
     editSchedule,
     deleteSchedule,
     completeSchedule,
-    initSchedules,
   } = useSchedule();
-  const { categories, initCategories } = useCategory();
+  const { categories } = useCategory();
   const [newTaskName, setNewTaskName] = useState('');
   const [selectedCategory, setSelectedCategory] =
     useState<ScheduleCategory>('habit');
@@ -32,11 +38,6 @@ const SchedulePage: FC = () => {
   const [intervalDays, setIntervalDays] = useState<number>(1);
   const [selectedUserCategoryId, setSelectedUserCategoryId] =
     useState<string>('');
-
-  useEffect(() => {
-    initSchedules();
-    initCategories();
-  }, []);
 
   const handleAddSchedule = () => {
     if (!newTaskName.trim()) return;
@@ -80,7 +81,7 @@ const SchedulePage: FC = () => {
     );
 
     if (uncategorizedItems.length > 0) {
-      groups.push({ categoryName: 'Other', items: uncategorizedItems });
+      groups.push({ categoryName: '기타', items: uncategorizedItems });
     }
 
     return groups;
@@ -99,7 +100,7 @@ const SchedulePage: FC = () => {
           <div className='schedule-info-area'>
             <div className='info-row'>
               <span>
-                목표 정진: {config.currentCount} / {config.targetCount}
+                대업 진행: {config.currentCount} / {config.targetCount}
               </span>
               <span>{progress}%</span>
             </div>
@@ -131,7 +132,7 @@ const SchedulePage: FC = () => {
         return (
           <div className='schedule-info-area'>
             <div className='info-text'>
-              ⏳ <b>{config.intervalDays}일 간격</b> 정진 규칙
+              ⏳ <b>{config.intervalDays}일 간격</b> 연마법
               {remainingDaysText && (
                 <span className='info-sub-text'>{remainingDaysText}</span>
               )}
@@ -147,10 +148,10 @@ const SchedulePage: FC = () => {
         return (
           <div className='schedule-info-area'>
             <div className='info-text'>
-              🔄 <b>주기 기간:</b> {config.periodStart} ~ {config.periodEnd}
+              🔄 <b>순환 기간:</b> {config.periodStart} ~ {config.periodEnd}
             </div>
             <div className='info-text secondary'>
-              이번 주기: {config.periodCount}회 / 전체 누적: {config.totalCount}
+              이번 순환: {config.periodCount}회 / 전체 누적: {config.totalCount}
               회
             </div>
           </div>
@@ -165,9 +166,9 @@ const SchedulePage: FC = () => {
     <div className='schedule-container'>
       {/* HEADER */}
       <div className='header'>
-        <div className='header-title'>📅 수련 일정 관리</div>
+        <div className='header-title'>📜 수행 비급 관리</div>
         <div className='header-subtitle'>
-          수행 목록을 추가, 수정하거나 오늘의 정진을 기록하세요.
+          수행 첩지를 작성하고 자신만의 정진 길을 설계하십시오.
         </div>
       </div>
 
@@ -179,7 +180,7 @@ const SchedulePage: FC = () => {
               key={cat}
               className={`cat-btn ${selectedCategory === cat ? 'active' : ''}`}
               onClick={() => setSelectedCategory(cat)}>
-              {cat.toUpperCase()}
+              {categoryLabels[cat]}
             </button>
           ),
         )}
@@ -191,7 +192,7 @@ const SchedulePage: FC = () => {
         value={selectedUserCategoryId}
         onChange={(e) => setSelectedUserCategoryId(e.target.value)}>
         <option disabled={true} value=''>
-          분류 선택
+          수행 분야 선택
         </option>
         {categories.map((cat) => (
           <option key={cat.id} value={cat.id}>
@@ -204,7 +205,7 @@ const SchedulePage: FC = () => {
       <div className='config-inputs-row'>
         {selectedCategory === 'goal' && (
           <div className='config-field'>
-            <label>목표 횟수</label>
+            <label>대업 목표치</label>
             <input
               type='number'
               value={targetCount}
@@ -215,7 +216,7 @@ const SchedulePage: FC = () => {
         )}
         {selectedCategory === 'interval' && (
           <div className='config-field'>
-            <label>반복 간격 (일)</label>
+            <label>연마 간격 (일)</label>
             <input
               type='number'
               value={intervalDays}
@@ -226,7 +227,7 @@ const SchedulePage: FC = () => {
         )}
         {selectedCategory === 'periodic' && (
           <div className='config-field'>
-            <label>초기화 주기</label>
+            <label>순환 주기</label>
             <select
               value={periodicType}
               onChange={(e) => setPeriodicType(e.target.value as any)}>
@@ -242,13 +243,13 @@ const SchedulePage: FC = () => {
         <input
           type='text'
           className='add-input'
-          placeholder='새로운 수련 항목을 입력하세요...'
+          placeholder='새로운 수행 과업을 입력하십시오...'
           value={newTaskName}
           onChange={(e) => setNewTaskName(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleAddSchedule()}
         />
         <button className='add-button' onClick={handleAddSchedule}>
-          추가
+          등록
         </button>
       </div>
 
@@ -276,11 +277,11 @@ const SchedulePage: FC = () => {
                     }
                   />
                   <span className={`cat-badge ${item.scheduleCategory}`}>
-                    {item.scheduleCategory}
+                    {categoryLabels[item.scheduleCategory]}
                   </span>
                   <input
                     type='text'
-                    className={`task-title-input ${item.completed ? 'strikethrough' : ''}`}
+                    className={`task-title-input ${item.completed ? 'completed' : ''}`}
                     value={item.config.name}
                     onChange={(e) => handleUpdateName(item.id, e.target.value)}
                     disabled={
@@ -294,7 +295,7 @@ const SchedulePage: FC = () => {
                   <span
                     className='delete-icon'
                     onClick={() => deleteSchedule(item.id)}>
-                    🗑️
+                    ✕
                   </span>
                 </div>
                 {/* 카테고리별 세부 정보 표시 */}

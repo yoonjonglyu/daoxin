@@ -5,7 +5,6 @@
 }
 
 .status-section {
-  background: linear-gradient(135deg, #ffffff 0%, #f0f4ff 100%);
   padding: 24px;
   border-radius: 20px;
   box-shadow: 0 10px 30px rgba(26, 115, 232, 0.1);
@@ -78,10 +77,13 @@
 }
 
 .section-title {
-  font-size: 16px;
-  font-weight: 600;
-  margin: 0;
-  padding-left: 4px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 0 0 8px 0;
+  color: var(--text-main);
+  border-left: 3px solid var(--jade-green);
+  padding-left: 12px;
+  letter-spacing: 0.1em;
 }
 
 .item-list {
@@ -91,36 +93,79 @@
 }
 
 .item-card {
-  background-color: var(--bg-color);
-  padding: 16px;
-  border-radius: 14px;
+  /* 낡은 족자 종이 질감 */
+  background: linear-gradient(to right, #d4c39e, #f1e7c9 10%, #f1e7c9 90%, #d4c39e);
+  padding: 12px 20px;
+  border-radius: 4px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border: 1px solid var(--border-color);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border: none;
+  margin-bottom: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  position: relative;
+  transition: all 0.3s ease;
+  color: #3e2723; /* 먹색에 가까운 진한 갈색 글씨 */
+  font-weight: 600;
+}
+
+/* 족자 좌우 끝부분 장식 */
+.item-card::before, .item-card::after {
+  content: '';
+  position: absolute;
+  top: -2px;
+  bottom: -2px;
+  width: 6px;
+  background: #5d4037; /* 족자 봉 색상 (진한 나무색) */
+  border-radius: 2px;
+  box-shadow: 0 0 5px rgba(0,0,0,0.5);
+}
+
+.item-card::before { left: -3px; }
+.item-card::after { right: -3px; }
+
+.item-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
 }
 
 .item-card:active {
-  transform: scale(0.98);
-  background-color: #fafafa;
+  transform: scale(0.99);
 }
 
 .complete-btn {
-  background-color: #e8f0fe;
-  border: none;
-  border-radius: 8px;
-  padding: 8px 14px;
-  color: var(--primary-color);
+  /* 낙관(인장) 스타일 */
+  background-color: transparent;
+  border: 2px solid var(--cinnabar-red);
+  border-radius: 4px;
+  padding: 4px 10px;
+  color: var(--cinnabar-red);
+  font-family: 'Noto Serif KR', serif;
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
+  transition: all 0.2s;
+}
+
+.complete-btn:hover {
+  background-color: var(--cinnabar-red);
+  color: white;
+  box-shadow: 0 0 8px var(--cinnabar-red);
 }
 
 .habit-checkbox {
-  width: 20px;
-  height: 20px;
+  accent-color: var(--jade-green);
+  width: 18px;
+  height: 18px;
   cursor: pointer;
+  filter: sepia(1) saturate(2); /* 한지 위에 어울리는 색감으로 보정 */
+}
+
+@media (max-width: 400px) {
+  .item-card { padding: 10px 14px; font-size: 0.95rem; }
+  .section-title { font-size: 1rem; }
+  .complete-btn { padding: 3px 8px; font-size: 12px; }
+  .stamp-seal { font-size: 0.85rem; right: 15%; }
 }
 
 /* Empty State 스타일 */
@@ -153,4 +198,188 @@
   font-size: 12px;
   color: #9ca3af;
   margin-top: 6px;
+}
+
+/* 수행완료 인장(Seal) 스타일 */
+.stamp-seal {
+  position: absolute;
+  right: 20%;
+  top: 50%;
+  transform: translateY(-50%) rotate(-15deg);
+  border: 3px double var(--cinnabar-red);
+  color: var(--cinnabar-red);
+  font-family: 'Noto Serif KR', serif;
+  font-size: 1rem;
+  font-weight: 900;
+  padding: 2px 6px;
+  background-color: rgba(139, 0, 0, 0.03);
+  border-radius: 2px;
+  pointer-events: none;
+  user-select: none;
+  z-index: 10;
+  white-space: nowrap;
+  opacity: 0;
+  animation: stamp-slam 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes stamp-slam {
+  0% {
+    transform: translateY(-50%) rotate(-45deg) scale(3);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(-50%) rotate(-15deg) scale(1);
+    opacity: 0.7;
+  }
+}
+
+/* 스케줄 그룹 레이아웃 및 제목 */
+.schedule-group {
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.group-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--jade-green);
+  margin-bottom: 10px;
+  padding-left: 8px;
+  border-left: 2px solid var(--jade-green);
+  letter-spacing: 0.05em;
+}
+
+.item-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+.item-desc {
+  font-size: 0.75rem;
+  color: #5d4037; /* 나무색/먹색 계열 */
+  opacity: 0.8;
+  font-weight: 500;
+}
+
+/* 수행 비급 관리 (SchedulePage) 테마 스타일 */
+.schedule-container {
+  padding-bottom: 40px;
+  text-align: left;
+}
+
+.category-selector {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.cat-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  color: var(--text-dim);
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 13px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+
+.cat-btn.active {
+  background: var(--jade-green);
+  color: white;
+  border-color: var(--jade-green);
+}
+
+.user-category-select {
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  border-radius: 8px;
+  padding: 10px;
+  color: var(--text-main);
+  margin-bottom: 16px;
+  outline: none;
+}
+
+.config-field label {
+  font-size: 12px;
+  color: var(--text-dim);
+  margin-bottom: 4px;
+  display: block;
+}
+
+.config-field input, .config-field select {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 8px;
+  color: var(--text-main);
+  outline: none;
+  width: 100%;
+}
+
+.add-section {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.add-input {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  border-radius: 8px;
+  padding: 10px 14px;
+  color: var(--text-main);
+  outline: none;
+}
+
+.add-button {
+  background: var(--jade-green);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0 20px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.task-card {
+  background: linear-gradient(to right, #d4c39e, #f1e7c9 10%, #f1e7c9 90%, #d4c39e);
+  padding: 14px 20px;
+  border-radius: 4px;
+  margin-bottom: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  position: relative;
+  color: #3e2723;
+}
+
+.task-card::before, .task-card::after {
+  content: '';
+  position: absolute;
+  top: -2px; bottom: -2px; width: 5px;
+  background: #5d4037;
+  border-radius: 2px;
+}
+.task-card::before { left: -3px; }
+.task-card::after { right: -3px; }
+
+.task-title-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: inherit;
+  outline: none;
+}
+
+.task-title-input.completed {
+  text-decoration: line-through;
+  opacity: 0.6;
 }

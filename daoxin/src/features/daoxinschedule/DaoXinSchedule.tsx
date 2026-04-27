@@ -16,9 +16,9 @@ const DaoXinSchedule: FC = () => {
 
   // 스케줄을 타입별로 그룹화 (habit 제외, 빈 그룹 제외)
   const sections = useMemo(() => [
-    { name: 'goal', title: '🎯 목표 달성', items: schedules.filter((s) => s.scheduleCategory === 'goal') },
-    { name: 'interval', title: '⏳ 간격 수련', items: schedules.filter((s) => s.scheduleCategory === 'interval') },
-    { name: 'periodic', title: '🔄 주기 정진', items: schedules.filter((s) => s.scheduleCategory === 'periodic') },
+    { name: 'goal', title: '🎯 대업 목표', items: schedules.filter((s) => s.scheduleCategory === 'goal') },
+    { name: 'interval', title: '⏳ 주기 연마', items: schedules.filter((s) => s.scheduleCategory === 'interval') },
+    { name: 'periodic', title: '🔄 순환 정진', items: schedules.filter((s) => s.scheduleCategory === 'periodic') },
   ].filter(section => section.items.length > 0), [schedules]);
 
   if (sections.length === 0) {
@@ -49,6 +49,9 @@ const DaoXinSchedule: FC = () => {
                   key={item.id} 
                   className={`item-card cat-${item.scheduleCategory} ${item.completed ? 'completed' : ''}`}
                 >
+                  {/* 수행 완료 시 나타나는 붉은 낙관 */}
+                  {item.completed && <div className="stamp-seal">수행완료</div>}
+
                   <div className='item-info'>
                     <span className='item-name'>{item.config.name}</span>
                     
@@ -60,7 +63,7 @@ const DaoXinSchedule: FC = () => {
                     )}
                     {isPeriodic && (
                       <span className='item-desc'>
-                        이번 주기: {(item.config as PeriodicConfig).periodCount}회
+                        이번 순환: {(item.config as PeriodicConfig).periodCount}회
                       </span>
                     )}
                     {isInterval && item.completed && (item.config as IntervalConfig).lastExecutedAt && (
@@ -73,7 +76,7 @@ const DaoXinSchedule: FC = () => {
                     )}
                   </div>
 
-                  <button 
+                  <button
                     className='complete-btn' 
                     onClick={() => completeSchedule(item.id)}
                     disabled={
@@ -83,7 +86,7 @@ const DaoXinSchedule: FC = () => {
                       )
                     }
                   >
-                    {isPeriodic ? '+1' : (item.completed ? '✓' : (isGoal ? '+1' : '완료'))}
+                    {isPeriodic ? '정진' : (item.completed ? '완료' : (isGoal ? '수행' : '수행'))}
                   </button>
                 </div>
               );

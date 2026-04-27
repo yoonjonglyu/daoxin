@@ -1,14 +1,26 @@
 .wrap {
   position: relative;
-  width: calc(100% - 4rem);
-  max-width: 800px;
-  height: 100vh;
+  width: 100%;
+  max-width: 600px; /* 몰입도를 위해 너비 제한 */
+  min-height: 100vh;
   margin: 0 auto;
-  padding: 0 2rem;
+  padding: 0 1rem;
   text-align: center;
+  
+  /* 영기가 감도는 듯한 효과 */
+  background: rgba(12, 12, 14, 0.7);
+  backdrop-filter: blur(15px);
+  box-shadow: 0 0 60px rgba(0, 0, 0, 0.5);
+  border-left: 1px solid rgba(212, 175, 55, 0.05);
+  border-right: 1px solid rgba(212, 175, 55, 0.05);
 }
 
 main {
   width: 100%;
-  margin: 16px auto;
+  margin: 0 auto;
+  padding-top: 1rem;
+}
+
+@media (max-width: 400px) {
+  .wrap { padding: 0 0.75rem; }
 }

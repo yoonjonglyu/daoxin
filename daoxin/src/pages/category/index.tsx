@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import { useMemo, useEffect, useState } from 'react';
+import { useMemo, useState } from 'react';
 import './category.css';
 import type { Category } from '../../types/category';
 
@@ -21,12 +21,11 @@ const CategoryPage: FC = () => {
   const {
     categories,
     selectedCategoryName,
-    initCategories,
     selectCategoryByName,
     addCategory,
     deleteCategory,
   } = useCategory();
-  const { schedules, initSchedules } = useSchedule();
+  const { schedules } = useSchedule();
   const { logs, dailyStats, weeklyStats, initLogs } = useActivityLog();
 
   const [newCatName, setNewCatName] = useState('');
@@ -46,11 +45,6 @@ const CategoryPage: FC = () => {
     setNewCatName('');
   };
 
-  useEffect(() => {
-    initCategories();
-    initSchedules();
-    initLogs();
-  }, []);
 
   // 스케줄 데이터를 기반으로 카테고리별 통계 계산
   const categoryStats = useMemo(() => {
@@ -137,18 +131,18 @@ const CategoryPage: FC = () => {
     <div className='category-container'>
       {/* HEADER */}
       <div className='header'>
-        <div className='header-title'>📊 통계</div>
+        <div className='header-title'>📜 정진 현황</div>
         <div className='header-subtitle'>
-          수행 현황과 카테고리별 통계를 확인합니다
+          현재까지 쌓아온 공력과 경지를 확인합니다
         </div>
       </div>
 
       {/* MAIN STATS OVERVIEW */}
       <div className='stats-overview'>
         <div className='gauge-section'>
-          <div className='gauge-label'>현재 도심(道心) 게이지</div>
+          <div className='gauge-label'>현재의 도심(道心)</div>
           <div className='gauge-value'>
-            {dao.gauge} / {MAX_GAUGE}
+            {dao.gauge} <span className="max-unit">/ {MAX_GAUGE}</span>
           </div>
           <div className='gauge-bar-container'>
             <div
@@ -160,11 +154,11 @@ const CategoryPage: FC = () => {
 
         <div className='progress-summary'>
           <div>
-            <div className='summary-label'>오늘의 달성률</div>
+            <div className='summary-label'>금일 정진율</div>
             <div className='summary-value'>{totalProgress}%</div>
           </div>
           <div className='summary-right'>
-            <div className='summary-label'>완료된 수행</div>
+            <div className='summary-label'>완수한 수련</div>
             <div className='summary-value'>
               {completedTasks} / {totalTasks}
             </div>
@@ -173,44 +167,41 @@ const CategoryPage: FC = () => {
       </div>
 
       {/* ACTIVITY LOG STATS */}
-      <div className='section-title'>정진 기록 통계</div>
+      <div className='section-title'>영기(靈氣) 흐름</div>
       <div className='period-selector'>
         <button 
           className={`period-btn ${statPeriod === 'daily' ? 'active' : ''}`}
-          onClick={() => setStatPeriod('daily')}
-        >오늘</button>
+          onClick={() => setStatPeriod('daily')}>금일</button>
         <button 
           className={`period-btn ${statPeriod === 'weekly' ? 'active' : ''}`}
-          onClick={() => setStatPeriod('weekly')}
-        >이번 주</button>
+          onClick={() => setStatPeriod('weekly')}>금주</button>
         <button 
           className={`period-btn ${statPeriod === 'monthly' ? 'active' : ''}`}
-          onClick={() => setStatPeriod('monthly')}
-        >이번 달</button>
+          onClick={() => setStatPeriod('monthly')}>이달</button>
       </div>
       
       <div className='stats-grid'>
         <div className='stat-card'>
-          <div className='stat-label'>획득 경험치</div>
-          <div className='stat-value highlight'>{activeStats.totalExp} EXP</div>
+          <div className='stat-label'>획득 공력</div>
+          <div className='stat-value highlight'>{activeStats.totalExp}</div>
         </div>
         <div className='stat-card'>
-          <div className='stat-label'>도심 게이지</div>
+          <div className='stat-label'>도심 상승</div>
           <div className='stat-value highlight'>+{activeStats.totalGauge}</div>
         </div>
         <div className='stat-card'>
-          <div className='stat-label'>완료 횟수</div>
-          <div className='stat-value'>{activeStats.completedCount} 회</div>
+          <div className='stat-label'>정진 횟수</div>
+          <div className='stat-value'>{activeStats.completedCount}</div>
         </div>
       </div>
 
       {/* CATEGORY MANAGEMENT (ADD) */}
-      <div className='section-title'>카테고리 관리</div>
+      <div className='section-title'>수행 부문 관리</div>
       <div className='add-cat-section'>
         <input
           type='text'
           className='add-cat-input'
-          placeholder='새 카테고리 이름...'
+          placeholder='새로운 수행 분야...'
           value={newCatName}
           onChange={(e) => setNewCatName(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleAddCategory()}
@@ -221,7 +212,7 @@ const CategoryPage: FC = () => {
       </div>
 
       {/* CATEGORY PROGRESS LIST */}
-      <div className='section-title'>진행도 및 통계</div>
+      <div className='section-title'>분야별 수양 정도</div>
       <div className='category-list'>
         {categoryStats.map((cat) => {
           const levelInfo = getCategoryLevelInfo(cat.exp);
@@ -252,14 +243,14 @@ const CategoryPage: FC = () => {
                 </div>
                 {cat.name !== '기타' && (
                   <span className='category-card-status'>
-                    Lv.{levelInfo.level} {rank} (
+                    제{levelInfo.level}성 {rank} (
                     {Math.floor(levelInfo.progress)}%)
                   </span>
                 )}
               </div>
               <div className='progress-bar-container'>
                 <div
-                  className={`progress-bar-fill ${rankClass}`}
+                  className={`progress-bar-fill`}
                   style={{ width: `${cat.name === '기타' ? 100 : levelInfo.progress}%` }}
                 />
               </div>
@@ -274,22 +265,22 @@ const CategoryPage: FC = () => {
           <div className='detail-name'>
             {currentDetail.name}{' '}
             <span className={`detail-lv-badge ${detailRankClass}`}>
-              Lv.{detailLevel.level}
+              제{detailLevel.level}성
             </span>
           </div>
           <div className='detail-stats'>
-            {getCategoryRank(detailLevel.level)} (누적 경험치:{' '}
-            {currentDetail.exp}) | 오늘 완료: {currentDetail.completed} /{' '}
+            {getCategoryRank(detailLevel.level)} (누적 공력:{' '}
+            {currentDetail.exp}) | 금일 완료: {currentDetail.completed} /{' '}
             {currentDetail.total}
           </div>
-          <div className='section-title'>수행 목록</div>
+          <div className='section-title-small'>세부 수행 목록</div>
           <div className='task-list'>
             {currentDetail.items.map((item, idx) => (
               <div
                 key={idx}
                 className={`task-item ${item.completed ? 'completed' : ''}`}>
                 <span>{item.todo}</span>
-                {item.completed && <span className='check-icon'>✓</span>}
+                {item.completed && <span className='check-icon'>☯️</span>}
               </div>
             ))}
           </div>
