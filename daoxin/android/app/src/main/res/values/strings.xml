@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">ABILITY: DaoXin(道心)</string>
+    <string name="title_activity_main">ABILITY: DaoXin(道心)</string>
+    <string name="package_name">com.yoonjongryu.daoxin</string>
+    <string name="custom_url_scheme">com.yoonjongryu.daoxin</string>
+</resources>

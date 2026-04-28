@@ -111,6 +111,8 @@
 /* 내부 에너지가 소용돌이치는 효과 */
 .inner-area::after {
   content: '';
+  width: 95%;
+  border-radius: 50%;
   position: absolute;
   inset: 0;
   background: radial-gradient(circle at center, transparent 30%, var(--stage-color) 150%);
