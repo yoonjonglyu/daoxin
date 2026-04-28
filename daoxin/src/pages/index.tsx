@@ -6,6 +6,9 @@ import MainPage from './main';
 import CategoryPage from './category';
 import SchedulePage from './schedule';
 
+const isCapacitor = import.meta.env.VITE_BUILD_TARGET === 'capacitor';
+const routerBasename = isCapacitor ? '' : '/daoxin';
+
 const router = createBrowserRouter(
   [
     {
@@ -21,7 +24,7 @@ const router = createBrowserRouter(
       ],
     },
   ],
-  { basename: '/daoxin' },
+  { basename: routerBasename },
 );
 
 export default router;
