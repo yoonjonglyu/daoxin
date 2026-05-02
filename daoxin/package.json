@@ -15,6 +15,7 @@
     "build:android": "cross-env VITE_BUILD_TARGET=capacitor vite build && pnpm cap sync android"
   },
   "dependencies": {
+    "@capacitor-community/admob": "^6.2.0",
     "@capacitor/android": "^8.3.1",
     "@capacitor/core": "^8.3.1",
     "isa-util": "^1.0.17",
