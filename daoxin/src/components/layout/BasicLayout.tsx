@@ -3,7 +3,7 @@ import React from "react";
 import './basiclayout.css';
 
 const isCapacitor = import.meta.env.VITE_BUILD_TARGET === 'capacitor';
-const routerBasename = isCapacitor ? '' : '/daoxin';
+const routerBasename = isCapacitor ? '/' : '/daoxin/';
 
 export interface BasicLayoutProps {
   children?: React.ReactNode;

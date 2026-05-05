@@ -1,5 +1,5 @@
 import { useAtom, useAtomValue } from 'jotai';
-import { activityLogsAtom, dailyStatsAtom, weeklyStatsAtom, totalStatsAtom, monthlyStatsAtom } from '../store/activityLogAtom';
+import { activityLogsAtom, dailyStatsAtom, weeklyStatsAtom, totalStatsAtom, monthlyStatsAtom } from '../store/activityLog';
 import { ActivityLog } from '../types/activitylog';
 import { saveEncryptedData, loadEncryptedData } from '../utils/storage';
 import { LOG_STORAGE_KEY } from '../value';
