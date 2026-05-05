@@ -2,10 +2,11 @@
   position: relative;
   width: 100%;
   max-width: 600px; /* 몰입도를 위해 너비 제한 */
-  min-height: 100vh;
+  min-height: 100dvh; /* 모바일 동적 뷰포트 높이 대응 */
   margin: 0 auto;
   padding: 0 1rem;
   text-align: center;
+  overflow: hidden;
   
   /* 영기가 감도는 듯한 효과 */
   background: rgba(12, 12, 14, 0.7);
@@ -22,7 +23,23 @@ main {
 }
 
 @media (max-width: 400px) {
-  .wrap { padding: 0 0.75rem; }
+  .wrap { 
+    padding: 0; 
+  }
+  main {
+    padding-top: 0.5rem;
+  }
+  /* 모바일 세로 공간 절약을 위한 전역 스타일 조정 */
+  h2 { 
+    font-size: 1.5rem !important; 
+    margin: 0.5rem 0 !important; 
+  }
+  h3 { 
+    font-size: 1.1rem !important; 
+    margin: 0.5rem 0 !important; 
+  }
+  section { margin-bottom: 0.75rem !important; }
+  .status-section { padding: 0.5rem 0 !important; }
 }
 .app-loading-container, .main-loading {
   display: flex;

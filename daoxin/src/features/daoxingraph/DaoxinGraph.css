@@ -65,7 +65,7 @@
   align-items: center;
   width: 240px;
   height: 240px;
-  margin: 30px auto;
+  margin: 1.5rem auto;
   position: relative;
   border-radius: 50%;
 }
@@ -149,8 +149,9 @@
   .graph-container {
     width: 200px;
     height: 200px;
-    margin: 20px auto;
+    margin: 0.75rem auto;
   }
+  .core-content { gap: 0; }
   .core-value { font-size: 18px; }
   .core-label { font-size: 10px; }
 }
