@@ -13,7 +13,7 @@ const AdBanner: React.FC = () => {
   if (!isAdEnabled) return null;
 
   // 앱 환경이면 AdMob, 웹 환경이면 AdSense 반환
-  if (environment === 'app') {
+  if (environment === 'ios' || environment === 'android') {
     return <AdMobBanner />;
   }
 
