@@ -1,8 +1,8 @@
 import React from 'react';
-import { useAds } from '../adsProvider';
+import { useAds } from './AdsProvider';
 import AdSenseBanner from './AdSenseBanner';
 import AdMobBanner from './AdMobBanner';
-import CoupangBanner from './CoupangBanner';
+// import CoupangBanner from './CoupangBanner';
 
 /**
  * 환경(Web/App)에 따라 적절한 광고를 렌더링하는 통합 컴포넌트
@@ -18,9 +18,9 @@ const AdBanner: React.FC = () => {
   }
 
   return (
-    <div className="web-ads-container">
+    <div className='web-ads-container'>
       <AdSenseBanner />
-      <CoupangBanner />
+      {/* <CoupangBanner /> */}
     </div>
   );
 };

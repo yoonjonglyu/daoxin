@@ -1,5 +1,6 @@
 
-import React, { createContext, useContext, useMemo, ReactNode } from 'react';
+import React, { createContext, useContext, useMemo, ReactNode, useEffect, useCallback } from 'react';
+import { AdMob } from '@capacitor-community/admob';
 
 /**
  * 광고 플랫폼 및 환경 타입 정의
@@ -9,6 +10,7 @@ type AdEnvironment = 'web' | 'app';
 interface AdConfig {
   adsense: { clientId: string; slotId: string };
   admob: { bannerUnitId: string; interstitialUnitId: string };
+  rewarded: { unitId: string };
   coupang: { widgetId: string; trackingCode: string };
 }
 
@@ -16,6 +18,8 @@ interface AdsContextValue {
   environment: AdEnvironment;
   config: AdConfig;
   isAdEnabled: boolean;
+  showInterstitial: () => Promise<void>;
+  showRewardedAd: () => Promise<boolean>;
 }
 
 const AdsContext = createContext<AdsContextValue | undefined>(undefined);
@@ -47,20 +51,64 @@ export const AdsProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       bannerUnitId: 'ca-app-pub-XXXXXXXXXXXXXXXX/XXXXXXXXXX',
       interstitialUnitId: 'ca-app-pub-XXXXXXXXXXXXXXXX/XXXXXXXXXX',
     },
+    rewarded: {
+      unitId: 'ca-app-pub-XXXXXXXXXXXXXXXX/YYYYYYYYYY',
+    },
     coupang: {
       widgetId: 'XXXXXX',
       trackingCode: 'AFXXXXXXX',
     }
   }), []);
 
-  // 광고 활성화 여부 (예: 프리미엄 유저 체크 등 로직 추가 가능)
+  // 3. 광고 활성화 여부
   const isAdEnabled = true;
+
+  // 4. 플랫폼 초기화 (Capacitor AdMob)
+  useEffect(() => {
+    if (environment === 'app') {
+      AdMob.initialize().catch(err => console.error('AdMob Init Error:', err));
+    }
+  }, [environment]);
+
+  /**
+   * 전면 광고 표시 함수 (앱 환경 전용)
+   */
+  const showInterstitial = useCallback(async () => {
+    if (!isAdEnabled || environment !== 'app') return;
+    try {
+      await AdMob.prepareInterstitial({
+        adId: config.admob.interstitialUnitId,
+      });
+      await AdMob.showInterstitial();
+    } catch (err) {
+      console.error('Interstitial Error:', err);
+    }
+  }, [config.admob.interstitialUnitId, environment, isAdEnabled]);
+
+  /**
+   * 보상형 광고 (영약 시스템 등)
+   */
+  const showRewardedAd = useCallback(async (): Promise<boolean> => {
+    if (!isAdEnabled || environment !== 'app') return false;
+    try {
+      await AdMob.prepareRewardVideoAd({
+        adId: config.rewarded.unitId,
+      });
+      const reward = await AdMob.showRewardVideoAd();
+      return !!reward; // 보상 획득 여부 반환
+    } catch (err) {
+      console.error('Rewarded Ad Error:', err);
+      return false;
+    }
+  }, [config.rewarded.unitId, environment, isAdEnabled]);
 
   const value = useMemo(() => ({
     environment,
     config,
-    isAdEnabled
-  }), [environment, config, isAdEnabled]);
+    isAdEnabled,
+    showInterstitial,
+    showRewardedAd
+  }), [environment, config, isAdEnabled, showInterstitial, showRewardedAd]);
 
   return (
     <AdsContext.Provider value={value}>

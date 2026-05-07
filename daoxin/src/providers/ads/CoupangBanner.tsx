@@ -1,5 +1,5 @@
 import React from 'react';
-import { useAds } from '../adsProvider';
+import { useAds } from './AdsProvider';
 
 const CoupangBanner: React.FC = () => {
   const { config } = useAds();
