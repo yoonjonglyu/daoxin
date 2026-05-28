@@ -1,0 +1,271 @@
+.exit-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(12, 12, 14, 0.75); /* 짙은 먹색 반투명 */
+  backdrop-filter: blur(8px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 11000; /* 네비게이션바(1000)보다 높게 설정 */
+  animation: exitModalFadeIn 0.3s ease-out;
+}
+
+.exit-modal-card {
+  position: relative;
+  width: 90%;
+  max-width: 420px;
+  background-color: #121216; /* 짙은 현색(玄色) */
+  border: 1px solid rgba(212, 175, 55, 0.3); /* 은은한 금색 테두리 */
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7), 0 0 20px rgba(212, 175, 55, 0.05);
+  border-radius: 12px;
+  padding: 28px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  animation: exitModalScaleUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  overflow: hidden;
+}
+
+/* 선협풍 네 귀퉁이 금색 장식선 */
+.corner-decor {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border: 2px solid var(--gold-leaf);
+}
+
+.corner-decor.top-left {
+  top: 8px;
+  left: 8px;
+  border-right: none;
+  border-bottom: none;
+}
+
+.corner-decor.top-right {
+  top: 8px;
+  right: 8px;
+  border-left: none;
+  border-bottom: none;
+}
+
+.corner-decor.bottom-left {
+  bottom: 8px;
+  left: 8px;
+  border-right: none;
+  border-top: none;
+}
+
+.corner-decor.bottom-right {
+  bottom: 8px;
+  right: 8px;
+  border-left: none;
+  border-top: none;
+}
+
+/* 헤더 영역 */
+.exit-modal-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid rgba(212, 175, 55, 0.15);
+  padding-bottom: 12px;
+}
+
+.exit-modal-icon {
+  font-size: 1.6rem;
+  animation: spinSlow 8s linear infinite;
+}
+
+.exit-modal-title {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--gold-leaf);
+  text-shadow: 0 0 10px rgba(212, 175, 55, 0.2);
+  letter-spacing: 0.02em;
+}
+
+/* 바디 설명 영역 */
+.exit-modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.exit-modal-desc {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--text-main);
+  text-align: center;
+}
+
+/* 광고 컨테이너 */
+.exit-modal-ad-container {
+  position: relative;
+  border-radius: 8px;
+  background-color: rgba(20, 20, 25, 0.9);
+  border: 1px dashed rgba(212, 175, 55, 0.15);
+  padding: 16px;
+  min-height: 90px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ad-badge {
+  position: absolute;
+  top: 4px;
+  left: 6px;
+  font-size: 0.6rem;
+  font-weight: bold;
+  color: var(--text-dim);
+  background-color: rgba(255, 255, 255, 0.05);
+  padding: 1px 4px;
+  border-radius: 3px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.web-fallback-ad {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.web-fallback-ad:hover .ad-title {
+  color: #fff;
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
+}
+
+.web-fallback-ad:hover .ad-action-btn {
+  background-color: var(--gold-leaf);
+  color: var(--ink-black);
+  box-shadow: 0 0 10px rgba(212, 175, 55, 0.4);
+}
+
+.ad-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ad-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--gold-leaf);
+  transition: all 0.2s ease;
+}
+
+.ad-desc {
+  font-size: 0.72rem;
+  line-height: 1.4;
+  color: var(--text-dim);
+}
+
+.ad-action-btn {
+  flex-shrink: 0;
+  padding: 6px 12px;
+  font-size: 0.75rem;
+  font-weight: bold;
+  background-color: transparent;
+  color: var(--gold-leaf);
+  border: 1px solid var(--gold-leaf);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.app-ad-placeholder {
+  text-align: center;
+}
+
+.app-ad-placeholder .ad-title {
+  color: #a855f7; /* 보라빛 신비로운 분위기 */
+  margin-bottom: 2px;
+}
+
+/* 푸터 버튼 영역 */
+.exit-modal-footer {
+  display: flex;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.exit-modal-btn {
+  flex: 1;
+  padding: 12px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  border: 1px solid transparent;
+}
+
+/* 수행 계속하기 버튼 (주요 행동 버튼) */
+.cancel-btn {
+  background: linear-gradient(135deg, #1e3a1e 0%, var(--jade-green) 100%);
+  color: #ffffff;
+  border: 1px solid rgba(45, 90, 39, 0.4);
+  box-shadow: 0 4px 10px rgba(45, 90, 39, 0.2);
+}
+
+.cancel-btn:hover {
+  background: linear-gradient(135deg, var(--jade-green) 0%, #3e7a36 100%);
+  box-shadow: 0 4px 15px rgba(45, 90, 39, 0.4);
+  transform: translateY(-1px);
+}
+
+.cancel-btn:active {
+  transform: translateY(0);
+}
+
+/* 종료 버튼 (보조 행동 버튼) */
+.confirm-btn {
+  background-color: rgba(20, 20, 25, 0.8);
+  color: var(--text-dim);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.confirm-btn:hover {
+  background-color: var(--cinnabar-red);
+  color: #ffffff;
+  border-color: var(--cinnabar-red);
+  box-shadow: 0 4px 15px rgba(139, 0, 0, 0.3);
+  transform: translateY(-1px);
+}
+
+.confirm-btn:active {
+  transform: translateY(0);
+}
+
+/* 애니메이션 */
+@keyframes exitModalFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes exitModalScaleUp {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes spinSlow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}

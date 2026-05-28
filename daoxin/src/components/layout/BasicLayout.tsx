@@ -1,9 +1,12 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { useLocation } from "react-router";
+import { Capacitor, PluginListenerHandle } from '@capacitor/core';
 
 import './basiclayout.css';
 
 import AdBanner from '../../providers/ads/AdBanner'; // AdBanner 컴포넌트 임포트
 import { useAds } from '../../providers/ads/AdsProvider';
+import ExitAdModal from '../exitmodal/ExitAdModal';
 
 const isCapacitor = import.meta.env.VITE_BUILD_TARGET === 'capacitor';
 const routerBasename = isCapacitor ? '/' : '/daoxin/';
@@ -14,6 +17,8 @@ export interface BasicLayoutProps {
 
 const BasicLayout: React.FC<BasicLayoutProps> = ({ children }) => {
   const { isAdEnabled, environment } = useAds(); // 광고 상태 및 환경 가져오기
+  const [isExitModalOpen, setIsExitModalOpen] = useState(false);
+  const location = useLocation();
 
   // 실제 앱/웹 환경 판별
   const isApp = environment === 'ios' || environment === 'android';
@@ -27,7 +32,65 @@ const BasicLayout: React.FC<BasicLayoutProps> = ({ children }) => {
 
   // 앱 환경에서는 AdMob이 오버레이로 뜨므로 네비게이션 바의 bottom 위치를 조정해야 함
   const navBottomOffset = (isAdEnabled && isApp) ? adBannerHeight : 0;
-  
+
+  // 1. 웹 환경 뒤로가기(popstate) 방지 및 모달 제어
+  useEffect(() => {
+    if (Capacitor.isNativePlatform()) return;
+
+    // 홈 화면('/')에서만 뒤로가기 인터셉트
+    if (location.pathname !== '/') return;
+
+    if (!window.history.state || !window.history.state.noBack) {
+      window.history.pushState({ noBack: true }, '', window.location.href);
+    }
+
+    const handlePopState = () => {
+      setIsExitModalOpen(true);
+      window.history.pushState({ noBack: true }, '', window.location.href);
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, [location.pathname]);
+
+  // 2. Capacitor 네이티브 앱 환경 하드웨어 뒤로가기 제어
+  useEffect(() => {
+    if (!Capacitor.isNativePlatform()) return;
+
+    let handlerPromise: Promise<PluginListenerHandle> | null = null;
+
+    import('@capacitor/app').then(({ App }) => {
+      handlerPromise = App.addListener('backButton', () => {
+        if (location.pathname === '/') {
+          setIsExitModalOpen(true);
+        } else {
+          window.history.back();
+        }
+      });
+    });
+
+    return () => {
+      if (handlerPromise) {
+        handlerPromise.then((h) => h.remove());
+      }
+    };
+  }, [location.pathname]);
+
+  const handleConfirmExit = () => {
+    setIsExitModalOpen(false);
+    if (Capacitor.isNativePlatform()) {
+      import('@capacitor/app').then(({ App }) => {
+        App.exitApp();
+      });
+    } else {
+      window.history.go(-2);
+      setTimeout(() => {
+        window.close();
+      }, 100);
+    }
+  };
 
   return (
     <div className="basic-layout">
@@ -71,6 +134,13 @@ const BasicLayout: React.FC<BasicLayoutProps> = ({ children }) => {
           <span className="nav-label">수행</span>
         </a>
       </nav>
+
+      {/* 앱 종료 / 뒤로가기 광고 모달 */}
+      <ExitAdModal 
+        isOpen={isExitModalOpen} 
+        onClose={() => setIsExitModalOpen(false)} 
+        onConfirm={handleConfirmExit} 
+      />
     </div>
   );
 };

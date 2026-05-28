@@ -17,6 +17,7 @@
   "dependencies": {
     "@capacitor-community/admob": "^6.2.0",
     "@capacitor/android": "^8.3.1",
+    "@capacitor/app": "^8.1.0",
     "@capacitor/core": "^8.3.1",
     "isa-util": "^1.0.17",
     "jotai": "^2.12.2",
