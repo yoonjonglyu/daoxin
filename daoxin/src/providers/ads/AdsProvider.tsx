@@ -55,12 +55,12 @@ export const AdsProvider: React.FC<{ children: ReactNode }> = ({
         slotId: 'XXXXXXXXXX',
       },
       admob: {
-        bannerUnitId: 'ca-app-pub-2309708500958644/2710641005', // 테스트용 AdMob 배너 단위 ID (실제 ID로 교체 필요)
+        bannerUnitId: 'ca-app-pub-2309708500958644/2710641005', // 'ca-app-pub-3940256099942544/6300978111', // 안드로이드 배너 광고 테스트 ID
         // bannerUnitId: '', // 애드몹 배너 광고 단위 ID
-        interstitialUnitId: 'ca-app-pub-XXXXXXXXXXXXXXXX/XXXXXXXXXX',
+        interstitialUnitId: 'ca-app-pub-2309708500958644/5945145178', //'ca-app-pub-3940256099942544/1033173712', // 안드로이드 전면 광고 테스트 ID
       },
       rewarded: {
-        unitId: 'ca-app-pub-XXXXXXXXXXXXXXXX/YYYYYYYYYY',
+        unitId: 'ca-app-pub-3940256099942544/5224354917', // 안드로이드 보상형 광고 테스트 ID
       },
       coupang: {
         widgetId: 'XXXXXX',
@@ -79,6 +79,13 @@ export const AdsProvider: React.FC<{ children: ReactNode }> = ({
       AdMob.initialize().catch((err) =>
         console.error('AdMob Init Error:', err),
       );
+
+      // 앱 시작 시 전면 광고 미리 로드 (Preload)
+      if (isAdEnabled) {
+        AdMob.prepareInterstitial({
+          adId: config.admob.interstitialUnitId,
+        }).catch(e => console.error('Initial Preload Error:', e));
+      }
     }
   }, [environment]);
 
@@ -88,12 +95,14 @@ export const AdsProvider: React.FC<{ children: ReactNode }> = ({
   const showInterstitial = useCallback(async () => {
     if (!isAdEnabled || (environment !== 'ios' && environment !== 'android')) return;
     try {
-      await AdMob.prepareInterstitial({
-        adId: config.admob.interstitialUnitId,
-      });
+      // 표시를 시도하고, 만약 로드가 안 되어 있다면 다시 준비
       await AdMob.showInterstitial();
+      
+      // 다음번 노출을 위해 다시 로드
+      await AdMob.prepareInterstitial({ adId: config.admob.interstitialUnitId });
     } catch (err) {
-      console.error('Interstitial Error:', err);
+      console.warn('Ad not ready or failed to show, retrying load:', err);
+      await AdMob.prepareInterstitial({ adId: config.admob.interstitialUnitId });
     }
   }, [config.admob.interstitialUnitId, environment, isAdEnabled]);
 

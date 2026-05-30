@@ -29,7 +29,6 @@ export interface SettingsModalProps {
 // Default Google OAuth Client ID (users may override with their own)
 const DEFAULT_CLIENT_ID =
   '461126878180-licdkmqjj8b2sbmkl0ncg3fihldaufe4.apps.googleusercontent.com'; // 빈 값이면 구글 드라이브 기능 사용 불가 안내
-const CLIENT_ID = DEFAULT_CLIENT_ID;
 const SCOPES = 'https://www.googleapis.com/auth/drive.file';
 
 const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
@@ -165,31 +164,25 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
       );
       return;
     }
-    const initialize = async () => {
-      await GoogleSignIn.initialize({
-        clientId: CLIENT_ID,
-        scopes: [SCOPES],
-      });
-    };
+
     try {
-      let token: string;
+      let token: string | null = null;
 
       if (Capacitor.isNativePlatform()) {
-        await initialize();
-        // eslint-disable-next-line no-async-promise-executor
-        return new Promise(async (resolve) => {
-          // This will return null if there is no redirect result to handle
-          const result = await GoogleSignIn.signIn();
-          if (result.accessToken) {
-            resolve(result.accessToken);
-          } else {
-            resolve(null);
-          }
+        await GoogleSignIn.initialize({
+          clientId: effectiveClientId,
+          scopes: [SCOPES],
         });
+        const result = await GoogleSignIn.signIn();
+        token = result.accessToken || null;
       } else {
         // Web: Existing web script logic
         await loadGoogleScript();
-        token = await requestAccessToken(effectiveClientId);
+        token = await requestAccessToken(effectiveClientId) || null;
+      }
+
+      if (!token) {
+        throw new Error('No access token received');
       }
 
       setAccessToken(token);
