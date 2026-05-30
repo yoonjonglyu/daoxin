@@ -1,9 +1,11 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { RouterProvider } from 'react-router';
 
 import './App.css';
 
 import router from './pages/index';
+
+import SettingsModal from './features/settings/SettingsModal';
 
 import useConfig from './hooks/useConfig';
 import useDaoxin from './hooks/useDaoxin';
@@ -16,9 +18,11 @@ function App() {
   const { initSchedules } = useSchedule();
   const { initCategories } = useCategory();
   const { initLogs } = useActivityLog();
-  const { initialized, config } = useConfig();
+  const { initialized, config, initConfig } = useConfig();
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
 const handleinit = async () => {  
+  await initConfig();
   await initDaoxin();
   await initSchedules();
   await initCategories();
@@ -40,7 +44,8 @@ const handleinit = async () => {
 
   return (
     <div className='wrap'>
-      <RouterProvider router={router} />
+      <RouterProvider router={router({ onSettingsClick: () => setIsSettingsOpen(true) })} />
+      <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
     </div>
   );
 }

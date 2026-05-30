@@ -55,8 +55,8 @@ export const AdsProvider: React.FC<{ children: ReactNode }> = ({
         slotId: 'XXXXXXXXXX',
       },
       admob: {
-        bannerUnitId: 'ca-app-pub-3940256099942544/6300978111', // 테스트용 AdMob 배너 단위 ID (실제 ID로 교체 필요)
-        // bannerUnitId: 'ca-app-pub-2309708500958644/2710641005', // 애드몹 배너 광고 단위 ID
+        bannerUnitId: 'ca-app-pub-2309708500958644/2710641005', // 테스트용 AdMob 배너 단위 ID (실제 ID로 교체 필요)
+        // bannerUnitId: '', // 애드몹 배너 광고 단위 ID
         interstitialUnitId: 'ca-app-pub-XXXXXXXXXXXXXXXX/XXXXXXXXXX',
       },
       rewarded: {

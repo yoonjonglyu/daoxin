@@ -4,21 +4,24 @@ import { Capacitor, PluginListenerHandle } from '@capacitor/core';
 
 import './basiclayout.css';
 
-import AdBanner from '../../providers/ads/AdBanner'; // AdBanner 컴포넌트 임포트
+import AdBanner from '../../providers/ads/AdBanner';
 import { useAds } from '../../providers/ads/AdsProvider';
 import ExitAdModal from '../exitmodal/ExitAdModal';
+import { useTranslation } from '../../utils/i18n';
 
 const isCapacitor = import.meta.env.VITE_BUILD_TARGET === 'capacitor';
 const routerBasename = isCapacitor ? '/' : '/daoxin/';
 
 export interface BasicLayoutProps {
   children?: React.ReactNode;
+  onSettingsClick?: () => void;
 }
 
-const BasicLayout: React.FC<BasicLayoutProps> = ({ children }) => {
-  const { isAdEnabled, environment } = useAds(); // 광고 상태 및 환경 가져오기
+const BasicLayout: React.FC<BasicLayoutProps> = ({ children, onSettingsClick }) => {
+  const { isAdEnabled, environment } = useAds();
   const [isExitModalOpen, setIsExitModalOpen] = useState(false);
   const location = useLocation();
+  const { t } = useTranslation();
 
   // 실제 앱/웹 환경 판별
   const isApp = environment === 'ios' || environment === 'android';
@@ -114,24 +117,34 @@ const BasicLayout: React.FC<BasicLayoutProps> = ({ children }) => {
         </div>
       )}
 
+      {/* 설정 버튼 */}
+      <button
+        id="settings-trigger-btn"
+        className="settings-trigger-btn"
+        onClick={onSettingsClick}
+        aria-label="Open Settings"
+      >
+        ⚙️
+      </button>
+
       {/* 하단 네비게이션 바 */}
       <div className="bottom-navigation-container">
       </div>
       <nav 
         className="bottom-navigation" 
-        style={{ bottom: `${navBottomOffset}px` }} // 앱에서 광고가 활성화되면 위로 밀림
+        style={{ bottom: `${navBottomOffset}px` }}
       >
         <a href={routerBasename} className="nav-item">
           <span className="nav-icon">☯️</span>
-          <span className="nav-label">정진</span>
+          <span className="nav-label">{t('practice')}</span>
         </a>
         <a href={`${routerBasename}category`} className="nav-item">
           <span className="nav-icon">📜</span>
-          <span className="nav-label">경지</span>
+          <span className="nav-label">{t('realm')}</span>
         </a>
         <a href={`${routerBasename}schedule`} className="nav-item">
           <span className="nav-icon">⚔️</span>
-          <span className="nav-label">수행</span>
+          <span className="nav-label">{t('manual')}</span>
         </a>
       </nav>
 

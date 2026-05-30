@@ -14,9 +14,11 @@ import {
   getCategoryRankClass,
 } from '../../services/categoryService';
 import { MAX_GAUGE } from '../../value';
+import { useTranslation } from '../../utils/i18n';
 
 const CategoryPage: FC = () => {
   const { dao } = useDaoxin();
+  const { t } = useTranslation();
   const {
     categories,
     selectedCategoryName,
@@ -33,7 +35,7 @@ const CategoryPage: FC = () => {
   const handleAddCategory = () => {
     if (!newCatName.trim()) return;
     if (categories.some((c) => c.name === newCatName.trim())) {
-      alert('이미 존재하는 카테고리 이름입니다.');
+      alert(t('duplicateCategory'));
       return;
     }
     addCategory({
@@ -127,16 +129,16 @@ const CategoryPage: FC = () => {
     <div className='category-container'>
       {/* HEADER */}
       <div className='header'>
-        <div className='header-title'>📜 정진 현황</div>
+        <div className='header-title'>{t('cultivationStats')}</div>
         <div className='header-subtitle'>
-          현재까지 쌓아온 공력과 경지를 확인합니다
+          {t('statsSubtitle')}
         </div>
       </div>
 
       {/* MAIN STATS OVERVIEW */}
       <div className='stats-overview'>
         <div className='gauge-section'>
-          <div className='gauge-label'>현재의 도심(道心)</div>
+          <div className='gauge-label'>{t('currentDaoMind')}</div>
           <div className='gauge-value'>
             {dao.gauge} <span className="max-unit">/ {MAX_GAUGE}</span>
           </div>
@@ -150,11 +152,11 @@ const CategoryPage: FC = () => {
 
         <div className='progress-summary'>
           <div>
-            <div className='summary-label'>금일 정진율</div>
+            <div className='summary-label'>{t('todayProgressRate')}</div>
             <div className='summary-value'>{totalProgress}%</div>
           </div>
           <div className='summary-right'>
-            <div className='summary-label'>완수한 수련</div>
+            <div className='summary-label'>{t('completedPractice')}</div>
             <div className='summary-value'>
               {completedTasks} / {totalTasks}
             </div>
@@ -163,52 +165,52 @@ const CategoryPage: FC = () => {
       </div>
 
       {/* ACTIVITY LOG STATS */}
-      <div className='section-title'>영기(靈氣) 흐름</div>
+      <div className='section-title'>{t('qiFlow')}</div>
       <div className='period-selector'>
         <button 
           className={`period-btn ${statPeriod === 'daily' ? 'active' : ''}`}
-          onClick={() => setStatPeriod('daily')}>금일</button>
+          onClick={() => setStatPeriod('daily')}>{t('daily')}</button>
         <button 
           className={`period-btn ${statPeriod === 'weekly' ? 'active' : ''}`}
-          onClick={() => setStatPeriod('weekly')}>금주</button>
+          onClick={() => setStatPeriod('weekly')}>{t('weekly')}</button>
         <button 
           className={`period-btn ${statPeriod === 'monthly' ? 'active' : ''}`}
-          onClick={() => setStatPeriod('monthly')}>이달</button>
+          onClick={() => setStatPeriod('monthly')}>{t('monthly')}</button>
       </div>
       
       <div className='stats-grid'>
         <div className='stat-card'>
-          <div className='stat-label'>획득 공력</div>
+          <div className='stat-label'>{t('earnedQi')}</div>
           <div className='stat-value highlight'>{activeStats.totalExp}</div>
         </div>
         <div className='stat-card'>
-          <div className='stat-label'>도심 상승</div>
+          <div className='stat-label'>{t('daoMindUp')}</div>
           <div className='stat-value highlight'>+{activeStats.totalGauge}</div>
         </div>
         <div className='stat-card'>
-          <div className='stat-label'>정진 횟수</div>
+          <div className='stat-label'>{t('practiceCount')}</div>
           <div className='stat-value'>{activeStats.completedCount}</div>
         </div>
       </div>
 
       {/* CATEGORY MANAGEMENT (ADD) */}
-      <div className='section-title'>수행 부문 관리</div>
+      <div className='section-title'>{t('manageSectors')}</div>
       <div className='add-cat-section'>
         <input
           type='text'
           className='add-cat-input'
-          placeholder='새로운 수행 분야...'
+          placeholder={t('newSectorPlaceholder')}
           value={newCatName}
           onChange={(e) => setNewCatName(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleAddCategory()}
         />
         <button className='add-cat-button' onClick={handleAddCategory}>
-          추가
+          {t('add')}
         </button>
       </div>
 
       {/* CATEGORY PROGRESS LIST */}
-      <div className='section-title'>분야별 수양 정도</div>
+      <div className='section-title'>{t('realmBySector')}</div>
       <div className='category-list'>
         {categoryStats.map((cat) => {
           const levelInfo = getCategoryLevelInfo(cat.exp);
@@ -222,14 +224,14 @@ const CategoryPage: FC = () => {
               className={`category-card ${selectedCategoryName === cat.name ? 'active' : ''} ${rankClass}`}>
               <div className='category-card-header'>
                 <div className='category-card-name-wrapper'>
-                  <span className='category-card-name'>{cat.name}</span>
+                  <span className='category-card-name'>{cat.name !== '기타' ? cat.name : t('other')}</span>
                   {cat.name !== '기타' && (
                     <button
                       className='delete-cat-btn'
                       onClick={(e) => {
                         e.stopPropagation();
                         if (
-                          confirm(`'${cat.name}' 카테고리를 삭제하시겠습니까?`)
+                          confirm(t('deleteConfirm', { name: cat.name }))
                         )
                           deleteCategory(cat.id);
                       }}>
@@ -259,17 +261,17 @@ const CategoryPage: FC = () => {
       {currentDetail && detailLevel && (
         <div className={`category-detail ${detailRankClass}`}>
           <div className='detail-name'>
-            {currentDetail.name}{' '}
+            {currentDetail.name !== '기타' ? currentDetail.name : t('other')}{' '}
             <span className={`detail-lv-badge ${detailRankClass}`}>
               제{detailLevel.level}성
             </span>
           </div>
           <div className='detail-stats'>
-            {getCategoryRank(detailLevel.level)} (누적 공력:{' '}
-            {currentDetail.exp}) | 금일 완료: {currentDetail.completed} /{' '}
+            {getCategoryRank(detailLevel.level)} ({t('accumulatedQi')}:{' '}
+            {currentDetail.exp}) | {t('todayDone')}: {currentDetail.completed} /{' '}
             {currentDetail.total}
           </div>
-          <div className='section-title-small'>세부 수행 목록</div>
+          <div className='section-title-small'>{t('detailList')}</div>
           <div className='task-list'>
             {currentDetail.items.map((item, idx) => (
               <div

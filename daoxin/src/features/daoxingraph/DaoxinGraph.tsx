@@ -6,6 +6,8 @@ import CGraph from '../../components/cgraph/CGraph';
 import useDaoxin from '../../hooks/useDaoxin';
 import useSchedule from '../../hooks/useSchedule';
 
+import { useTranslation } from '../../utils/i18n';
+
 /**
  * @description
  * 0이상 발심
@@ -20,6 +22,7 @@ export interface DaoXinGraphProps {}
 const DaoXinGraph: React.FC<DaoXinGraphProps> = () => {
   const { dao } = useDaoxin();
   const { schedules } = useSchedule();
+  const { t } = useTranslation();
 
   const [isFeedback, setIsFeedback] = useState(false);
   const [isBreakthrough, setIsBreakthrough] = useState(false);
@@ -30,10 +33,10 @@ const DaoXinGraph: React.FC<DaoXinGraphProps> = () => {
   
   // 현재 경지 정보 계산
   const getStageInfo = (val: number) => {
-    if (val >= 77) return { label: '천교(天巧)', className: 'stage-cheon-gyo', color: 'var(--gold-leaf)' };
-    if (val >= 50) return { label: '응심(凝心)', className: 'stage-eung-sim', color: 'var(--cinnabar-red)' };
-    if (val >= 25) return { label: '승화(昇華)', className: 'stage-seung-hwa', color: 'var(--jade-green)' };
-    return { label: '발심(發心)', className: 'stage-bal-sim', color: 'var(--text-dim)' };
+    if (val >= 77) return { label: t('stageBalSim'), className: 'stage-cheon-gyo', color: 'var(--gold-leaf)' };
+    if (val >= 50) return { label: t('stageEungSim'), className: 'stage-eung-sim', color: 'var(--cinnabar-red)' };
+    if (val >= 25) return { label: t('stageSeungHwa'), className: 'stage-seung-hwa', color: 'var(--jade-green)' };
+    return { label: t('stageBalSim'), className: 'stage-bal-sim', color: 'var(--text-dim)' };
   };
 
   const currentStage = getStageInfo(dao.gauge);
@@ -67,7 +70,7 @@ const DaoXinGraph: React.FC<DaoXinGraphProps> = () => {
       {isBreakthrough && (
         <div className="breakthrough-overlay">
           <div className="bagua-symbol">☯️</div>
-          <div className="breakthrough-text">破境 (파경)</div>
+          <div className="breakthrough-text">{t('breakthroughText')}</div>
           <div className="new-rank-text">{label}</div>
         </div>
       )}
@@ -85,7 +88,7 @@ const DaoXinGraph: React.FC<DaoXinGraphProps> = () => {
           position: 'relative'
         }}>
         <div className='core-content'>
-          <span className='core-label'>도심(道心)</span>
+          <span className='core-label'>DaoXin(道心)</span>
           <strong className='core-value'>
               {label}
             </strong>

@@ -9,11 +9,15 @@ import SchedulePage from './schedule';
 const isCapacitor = import.meta.env.VITE_BUILD_TARGET === 'capacitor';
 const routerBasename = isCapacitor ? '' : '/daoxin';
 
-const router = createBrowserRouter(
+export interface RouterProps {
+  onSettingsClick?: () => void;
+}
+
+const router = ({onSettingsClick}: RouterProps) => createBrowserRouter(
   [
     {
       element: (
-        <BasicLayout>
+        <BasicLayout onSettingsClick={onSettingsClick}>
           <Outlet />
         </BasicLayout>
       ),

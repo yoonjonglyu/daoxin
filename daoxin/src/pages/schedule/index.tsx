@@ -13,13 +13,8 @@ import type {
 import useSchedule from '../../hooks/useSchedule';
 import useCategory from '../../hooks/useCategory';
 import { getIntervalRemainingDays } from '../../utils/date';
+import { useTranslation } from '../../utils/i18n';
 
-const categoryLabels: Record<ScheduleCategory, string> = {
-  habit: '상시(常時)',
-  goal: '대업(大業)',
-  interval: '연마(硏磨)',
-  periodic: '순환(循環)',
-};
 
 const SchedulePage: FC = () => {
   const {
@@ -30,6 +25,15 @@ const SchedulePage: FC = () => {
     completeSchedule,
   } = useSchedule();
   const { categories } = useCategory();
+  const { t } = useTranslation();
+
+  const categoryLabels: Record<ScheduleCategory, string> = {
+    habit: t('constant'),
+    goal: t('greatTask'),
+    interval: t('refining'),
+    periodic: t('cycling'),
+  };
+
   const [newTaskName, setNewTaskName] = useState('');
   const [selectedCategory, setSelectedCategory] =
     useState<ScheduleCategory>('habit');
@@ -81,7 +85,7 @@ const SchedulePage: FC = () => {
     );
 
     if (uncategorizedItems.length > 0) {
-      groups.push({ categoryName: '기타', items: uncategorizedItems });
+      groups.push({ categoryName: 'Other(기타)', items: uncategorizedItems });
     }
 
     return groups;
@@ -100,7 +104,7 @@ const SchedulePage: FC = () => {
           <div className='schedule-info-area'>
             <div className='info-row'>
               <span>
-                대업 진행: {config.currentCount} / {config.targetCount}
+                {t('greatTaskTarget')}: {config.currentCount} / {config.targetCount}
               </span>
               <span>{progress}%</span>
             </div>
@@ -122,23 +126,23 @@ const SchedulePage: FC = () => {
             config.intervalDays,
           );
           if (remainingDays > 0) {
-            remainingDaysText = ` (D-${remainingDays}일 후 활성화)`;
+            remainingDaysText = t('activeAfterDays', { days: remainingDays });
           } else {
-            remainingDaysText = ` (오늘부터 활성화)`;
+            remainingDaysText = t('activeFromToday');
           }
         } else if (!item.completed) {
-          remainingDaysText = ` (수행 가능)`;
+          remainingDaysText = t('availableToPractice');
         }
         return (
           <div className='schedule-info-area'>
             <div className='info-text'>
-              ⏳ <b>{config.intervalDays}일 간격</b> 연마법
+              ⏳ <b>{t('intervalRefiningText', { days: config.intervalDays })}</b>
               {remainingDaysText && (
                 <span className='info-sub-text'>{remainingDaysText}</span>
               )}
             </div>
             <div className='info-text secondary'>
-              누적 수행: {config.totalCount}회
+              {t('totalCompletions', { count: config.totalCount })}
             </div>
           </div>
         );
@@ -148,11 +152,10 @@ const SchedulePage: FC = () => {
         return (
           <div className='schedule-info-area'>
             <div className='info-text'>
-              🔄 <b>순환 기간:</b> {config.periodStart} ~ {config.periodEnd}
+              {t('cycleRange', { start: config.periodStart, end: config.periodEnd })}
             </div>
             <div className='info-text secondary'>
-              이번 순환: {config.periodCount}회 / 전체 누적: {config.totalCount}
-              회
+              {t('thisCycleCount', { count: config.periodCount, total: config.totalCount })}
             </div>
           </div>
         );
@@ -166,9 +169,9 @@ const SchedulePage: FC = () => {
     <div className='schedule-container'>
       {/* HEADER */}
       <div className='header'>
-        <div className='header-title'>📜 수행 비급 관리</div>
+        <div className='header-title'>{t('manageManuals')}</div>
         <div className='header-subtitle'>
-          수행 첩지를 작성하고 자신만의 정진 길을 설계하십시오.
+          {t('manualsSubtitle')}
         </div>
       </div>
 
@@ -192,7 +195,7 @@ const SchedulePage: FC = () => {
         value={selectedUserCategoryId}
         onChange={(e) => setSelectedUserCategoryId(e.target.value)}>
         <option disabled={true} value=''>
-          수행 분야 선택
+          {t('selectSector')}
         </option>
         {categories.map((cat) => (
           <option key={cat.id} value={cat.id}>
@@ -205,7 +208,7 @@ const SchedulePage: FC = () => {
       <div className='config-inputs-row'>
         {selectedCategory === 'goal' && (
           <div className='config-field'>
-            <label>대업 목표치</label>
+            <label>{t('greatTaskTarget')}</label>
             <input
               type='number'
               value={targetCount}
@@ -216,7 +219,7 @@ const SchedulePage: FC = () => {
         )}
         {selectedCategory === 'interval' && (
           <div className='config-field'>
-            <label>연마 간격 (일)</label>
+            <label>{t('refiningInterval')}</label>
             <input
               type='number'
               value={intervalDays}
@@ -227,13 +230,13 @@ const SchedulePage: FC = () => {
         )}
         {selectedCategory === 'periodic' && (
           <div className='config-field'>
-            <label>순환 주기</label>
+            <label>{t('cyclePeriod')}</label>
             <select
               value={periodicType}
               onChange={(e) => setPeriodicType(e.target.value as any)}>
-              <option value='daily'>매일</option>
-              <option value='weekly'>매주</option>
-              <option value='monthly'>매월</option>
+              <option value='daily'>{t('everyday')}</option>
+              <option value='weekly'>{t('everyweek')}</option>
+              <option value='monthly'>{t('everymonth')}</option>
             </select>
           </div>
         )}
@@ -243,13 +246,13 @@ const SchedulePage: FC = () => {
         <input
           type='text'
           className='add-input'
-          placeholder='새로운 수행 과업을 입력하십시오...'
+          placeholder={t('newTaskPlaceholder')}
           value={newTaskName}
           onChange={(e) => setNewTaskName(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleAddSchedule()}
         />
         <button className='add-button' onClick={handleAddSchedule}>
-          등록
+          {t('register')}
         </button>
       </div>
 
@@ -310,9 +313,9 @@ const SchedulePage: FC = () => {
       {schedules.length === 0 && (
         <div className='empty-state'>
           <span className='empty-icon'>📅</span>
-          <p className='empty-text'>아직 등록된 스케줄이 없습니다.</p>
+          <p className='empty-text'>{t('noManualsTitle')}</p>
           <p className='empty-subtext'>
-            새로운 스케줄을 추가하여 정진을 시작해 보세요.
+            {t('noManualsSub')}
           </p>
         </div>
       )}
