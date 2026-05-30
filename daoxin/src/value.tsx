@@ -23,9 +23,9 @@ export const DAOXIN_DEFAULT: Daoxin = {
 };
 
 export const DAOXIN_DEFAULT_CATEGORYS: Category[] = [
-  { id: 'cat-1', name: '(Health)신체 수련', description: '강건한 육신을 위한 정진', exp: 0 },
-  { id: 'cat-2', name: '(Mind)심신 안정', description: '맑은 정신과 도심을 닦는 행위', exp: 0 },
-  { id: 'cat-3', name: '(Wisdom)지식 정진', description: '세상의 이치를 깨닫는 공부', exp: 0 },
+  { id: 'cat-1', name: 'Health(신체 수련)', description: '강건한 육신을 위한 정진', exp: 0 },
+  { id: 'cat-2', name: 'Mind(심신 안정)', description: '맑은 정신과 도심을 닦는 행위', exp: 0 },
+  { id: 'cat-3', name: 'Wisdom(지식 정진)', description: '세상의 이치를 깨닫는 공부', exp: 0 },
 ];
 
 export const DAOXIN_DEFAULT_SCHEDULES: Schedule[] = [
@@ -35,7 +35,7 @@ export const DAOXIN_DEFAULT_SCHEDULES: Schedule[] = [
     type: 'daily',
     completed: false,
     categoryId: 'cat-2',
-    config: { name: '(Standing Meditation)참장공', count: 0 }
+    config: { name: 'Standing Meditation(참장공)', count: 0 }
   },
   {
     id: 'default-s2',
@@ -43,7 +43,7 @@ export const DAOXIN_DEFAULT_SCHEDULES: Schedule[] = [
     type: 'daily',
     completed: false,
     categoryId: 'cat-2',
-    config: { name: '(Meditation)명상', count: 0 }
+    config: { name: 'Meditation(명상)', count: 0 }
   },
   {
     id: 'default-s3',
@@ -51,6 +51,6 @@ export const DAOXIN_DEFAULT_SCHEDULES: Schedule[] = [
     type: 'daily',
     completed: false,
     categoryId: 'cat-1',
-    config: { name: '(Strength Training)근력 운동', count: 0 }
+    config: { name: 'Strength Training(근력 운동)', count: 0 }
   }
 ];
