@@ -42,10 +42,26 @@ export const aggregateStats = (logs: ActivityLog[]): ActivityStats => {
 };
 
 /**
- * 일간 통계: 특정 날짜(YYYY-MM-DD)의 로그만 필터링하여 집계
+ * 일간 통계: 특정 날짜(Date 객체 또는 YYYY-MM-DD 문자열)의 로컬 일자와 일치하는 로그만 필터링하여 집계
  */
-export const getDailyStats = (logs: ActivityLog[], dateStr: string): ActivityStats => {
-  const filtered = logs.filter(log => log.executedAt.startsWith(dateStr));
+export const getDailyStats = (logs: ActivityLog[], targetDate: Date | string = new Date()): ActivityStats => {
+  const target = typeof targetDate === 'string'
+    ? new Date(targetDate.replace(/\//g, '-'))
+    : targetDate;
+
+  const targetYear = target.getFullYear();
+  const targetMonth = target.getMonth();
+  const targetDay = target.getDate();
+
+  const filtered = logs.filter(log => {
+    if (!log.executedAt) return false;
+    const logDate = new Date(log.executedAt.replace(/\//g, '-'));
+    return (
+      logDate.getFullYear() === targetYear &&
+      logDate.getMonth() === targetMonth &&
+      logDate.getDate() === targetDay
+    );
+  });
   return aggregateStats(filtered);
 };
 
@@ -65,7 +81,8 @@ export const getWeeklyStats = (logs: ActivityLog[], targetDate: Date): ActivityS
   sunday.setHours(23, 59, 59, 999);
 
   const filtered = logs.filter(log => {
-    const logDate = new Date(log.executedAt);
+    if (!log.executedAt) return false;
+    const logDate = new Date(log.executedAt.replace(/\//g, '-'));
     return logDate >= monday && logDate <= sunday;
   });
 
@@ -81,7 +98,8 @@ export const getMonthlyStats = (logs: ActivityLog[], year: number, month: number
   const end = new Date(year, month + 1, 0, 23, 59, 59, 999);
 
   const filtered = logs.filter(log => {
-    const logDate = new Date(log.executedAt);
+    if (!log.executedAt) return false;
+    const logDate = new Date(log.executedAt.replace(/\//g, '-'));
     return logDate >= start && logDate <= end;
   });
 

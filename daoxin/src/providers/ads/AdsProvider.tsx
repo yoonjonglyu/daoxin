@@ -107,20 +107,31 @@ export const AdsProvider: React.FC<{ children: ReactNode }> = ({
   }, [config.admob.interstitialUnitId, environment, isAdEnabled]);
 
   /**
-   * 보상형 광고 (영약 시스템 등)
+   * 보상형 광고 (영약 및 영석 충전 시스템)
    */
   const showRewardedAd = useCallback(async (): Promise<boolean> => {
-    if (!isAdEnabled || (environment !== 'ios' && environment !== 'android')) return false;
-    try {
-      await AdMob.prepareRewardVideoAd({
-        adId: config.rewarded.unitId,
-      });
-      const reward = await AdMob.showRewardVideoAd();
-      return !!reward; // 보상 획득 여부 반환
-    } catch (err) {
-      console.error('Rewarded Ad Error:', err);
-      return false;
+    if (!isAdEnabled) return false;
+
+    // 네이티브 앱 환경 (Android / iOS)
+    if (environment === 'ios' || environment === 'android') {
+      try {
+        await AdMob.prepareRewardVideoAd({
+          adId: config.rewarded.unitId,
+        });
+        const reward = await AdMob.showRewardVideoAd();
+        return !!reward; // 보상 획득 여부 반환
+      } catch (err) {
+        console.error('Rewarded Ad Error:', err);
+        return false;
+      }
     }
+
+    // 웹 환경 Fallback: 1.5초 시뮬레이션 후 보상 지급
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve(true);
+      }, 1500);
+    });
   }, [config.rewarded.unitId, environment, isAdEnabled]);
 
   const value = useMemo(

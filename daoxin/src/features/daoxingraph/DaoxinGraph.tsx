@@ -5,6 +5,7 @@ import CGraph from '../../components/cgraph/CGraph';
 
 import useDaoxin from '../../hooks/useDaoxin';
 import useSchedule from '../../hooks/useSchedule';
+import { MAX_GAUGE } from '../../value';
 
 import { useTranslation } from '../../utils/i18n';
 
@@ -33,7 +34,7 @@ const DaoXinGraph: React.FC<DaoXinGraphProps> = () => {
   
   // 현재 경지 정보 계산
   const getStageInfo = (val: number) => {
-    if (val >= 77) return { label: t('stageBalSim'), className: 'stage-cheon-gyo', color: 'var(--gold-leaf)' };
+    if (val >= 77) return { label: t('stageCheonGyo'), className: 'stage-cheon-gyo', color: 'var(--gold-leaf)' };
     if (val >= 50) return { label: t('stageEungSim'), className: 'stage-eung-sim', color: 'var(--cinnabar-red)' };
     if (val >= 25) return { label: t('stageSeungHwa'), className: 'stage-seung-hwa', color: 'var(--jade-green)' };
     return { label: t('stageBalSim'), className: 'stage-bal-sim', color: 'var(--text-dim)' };
@@ -63,6 +64,7 @@ const DaoXinGraph: React.FC<DaoXinGraphProps> = () => {
   }, [completedCount]);
 
   const { label, className, color } = currentStage;
+  const gaugePercent = Math.min(100, Math.max(0, (dao.gauge / MAX_GAUGE) * 100));
 
   return (
     <div className={`graph-wrapper ${isBreakthrough ? 'breakthrough-active' : ''}`}>
@@ -79,21 +81,22 @@ const DaoXinGraph: React.FC<DaoXinGraphProps> = () => {
         className={`graph-container ${className} ${isFeedback ? 'trigger-feedback' : ''}`}
         style={{ ['--stage-color' as any]: color }}
       >
-      <CGraph
-        className="daoxin-spirit-sphere"
-        style={{
-          background: `conic-gradient(${color} 0% ${dao.gauge}%, rgba(255,255,255,0.05) ${dao.gauge}% 100%)`,
-          boxShadow: `0 0 30px ${color}44, inset 0 0 20px ${color}22`,
-          border: `1px solid ${color}33`,
-          position: 'relative'
-        }}>
-        <div className='core-content'>
-          <span className='core-label'>DaoXin(道心)</span>
-          <strong className='core-value'>
+        <CGraph
+          className="daoxin-spirit-sphere"
+          style={{
+            background: `conic-gradient(from 0deg, ${color} 0%, ${color} ${gaugePercent}%, rgba(255, 255, 255, 0.08) ${gaugePercent}%, rgba(255, 255, 255, 0.08) 100%)`,
+            boxShadow: `0 0 32px ${color}33, inset 0 0 16px ${color}22`,
+            border: `1px solid ${color}44`,
+            position: 'relative'
+          }}>
+          <div className='core-content'>
+            <span className='core-label'>DaoXin(道心)</span>
+            <strong className='core-value'>
               {label}
             </strong>
-        </div>
-      </CGraph>
+            <span className='core-gauge-detail'>{dao.gauge}/{MAX_GAUGE}</span>
+          </div>
+        </CGraph>
       </div>
     </div>
   );

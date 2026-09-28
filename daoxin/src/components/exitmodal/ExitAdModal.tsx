@@ -1,20 +1,27 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import './ExitAdModal.css';
 
 import { useAds } from '../../providers/ads/AdsProvider';
-
 import { useTranslation } from '../../utils/i18n';
+import useInventory from '../../hooks/useInventory';
+import AdConfirmModal from '../ads/AdConfirmModal';
 
 export interface ExitAdModalProps {
   isOpen: boolean;
   onClose: () => void;
   onConfirm: () => void;
+  onOpenShop?: () => void;
 }
 
-const ExitAdModal: React.FC<ExitAdModalProps> = ({ isOpen, onClose, onConfirm }) => {
-  const { showInterstitial, environment } = useAds();
+const ExitAdModal: React.FC<ExitAdModalProps> = ({ isOpen, onClose, onConfirm, onOpenShop }) => {
+  const { showInterstitial, showRewardedAd } = useAds();
+  const { activateExpBoost, addSpiritStones } = useInventory();
   const { t } = useTranslation();
+  const [isAdLoading, setIsAdLoading] = useState(false);
+  const [rewardToast, setRewardToast] = useState<string | null>(null);
+  const [isAdConfirmOpen, setIsAdConfirmOpen] = useState(false);
+
   // 모달이 열릴 때 AdMob 전면 광고(Interstitial) 실행 시도
   useEffect(() => {
     if (isOpen) {
@@ -23,6 +30,34 @@ const ExitAdModal: React.FC<ExitAdModalProps> = ({ isOpen, onClose, onConfirm })
   }, [isOpen, showInterstitial]);
 
   if (!isOpen) return null;
+
+  const executeClaimPotion = async () => {
+    setIsAdConfirmOpen(false);
+    if (isAdLoading) return;
+    setIsAdLoading(true);
+
+    try {
+      const rewardSuccess = await showRewardedAd();
+      if (rewardSuccess) {
+        // 비약(청심환 24시간 부스트) 활성화 및 보너스 영석 20개 지급
+        await activateExpBoost(24);
+        await addSpiritStones(20);
+        
+        setRewardToast(t('exitModalRewardSuccess'));
+        setTimeout(() => {
+          onClose();
+          onOpenShop?.();
+        }, 1200);
+      } else {
+        alert(t('adWatchFailed'));
+      }
+    } catch (err) {
+      console.error('Reward claim error:', err);
+      alert(t('adWatchFailed'));
+    } finally {
+      setIsAdLoading(false);
+    }
+  };
 
   return (
     <div className="exit-modal-overlay">
@@ -40,40 +75,56 @@ const ExitAdModal: React.FC<ExitAdModalProps> = ({ isOpen, onClose, onConfirm })
 
         <div className="exit-modal-body">
           <p className="exit-modal-desc">
-              {t('exitmodalDesc')}
+            {t('exitmodalDesc')}
           </p>
 
-          {/* 광고 영역 */}
-          <div className="exit-modal-ad-container">
-            <span className="ad-badge">AD</span>
-            {environment === 'web' ? (
-              <div className="web-fallback-ad" onClick={() => window.open('https://github.com/yoonjonglyu/daoxin', '_blank')}>
-                <div className="ad-content">
-                  <div className="ad-title">🔮 {t('adTitle')}</div>
-                  <div className="ad-desc">{t('adDesc')}</div>
-                </div>
-                <button className="ad-action-btn">{t('getPotion')}</button>
+          {rewardToast && (
+            <div className="exit-modal-reward-toast">
+              ✨ {rewardToast}
+            </div>
+          )}
+
+          {/* 광고 / 비약 수령 배너 영역 */}
+          <div 
+            className="exit-modal-ad-container clickable" 
+            onClick={() => setIsAdConfirmOpen(true)}
+            role="button"
+            tabIndex={0}
+          >
+            <span className="ad-badge">REWARD</span>
+            <div className="ad-content">
+              <div className="ad-title">
+                {isAdLoading ? `⏳ ${t('watchingAd')}` : `🔮 ${t('adTitle')}`}
               </div>
-            ) : (
-              <div className="app-ad-placeholder">
-                <div className="ad-content">
-                  <div className="ad-title">⚡ {t('adTitle')}</div>
-                  <div className="ad-desc">{t('adDesc')}</div>
-                </div>
-              </div>
-            )}
+              <div className="ad-desc">{t('adDesc')}</div>
+            </div>
+            <button 
+              className="ad-action-btn" 
+              disabled={isAdLoading}
+              onClick={(e) => { e.stopPropagation(); setIsAdConfirmOpen(true); }}
+            >
+              {isAdLoading ? t('watchingAd') : t('getPotion')}
+            </button>
           </div>
         </div>
 
         <div className="exit-modal-footer">
-          <button className="exit-modal-btn cancel-btn" onClick={onClose}>
+          <button className="exit-modal-btn cancel-btn" onClick={onClose} disabled={isAdLoading}>
             {t('continuePractice')}
           </button>
-          <button className="exit-modal-btn confirm-btn" onClick={onConfirm}>
+          <button className="exit-modal-btn confirm-btn" onClick={onConfirm} disabled={isAdLoading}>
             {t('confirmExit')}
           </button>
         </div>
       </div>
+
+      {/* 보상형 광고 시청 확인 다이얼로그 (Google AdMob 정책 준수) */}
+      <AdConfirmModal
+        isOpen={isAdConfirmOpen}
+        rewardName={t('potionRewardName')}
+        onConfirm={executeClaimPotion}
+        onClose={() => setIsAdConfirmOpen(false)}
+      />
     </div>
   );
 };

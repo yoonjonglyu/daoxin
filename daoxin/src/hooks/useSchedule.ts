@@ -11,15 +11,17 @@ import {
 } from '../store/schedule';
 
 import { saveEncryptedData, loadEncryptedData } from '../utils/storage';
-import { calculateNextPeriod } from '../utils/date';
+import { calculateNextPeriod, formatDate } from '../utils/date';
 import { earnExp, earnGauge, CATEGORY_REWARDS } from '../services/daoxinService';
 import { calculateScheduleCompletion, refreshScheduleStatus } from '../services/scheduleService';
 
 import useDaoxin from './useDaoxin';
 import useCategory from './useCategory';
 import useActivityLog from './useActivityLog';
+import useInventory from './useInventory';
+import { calculateCultivationReward, trainEquippedTechniques } from '../services/techniqueService';
 
-import { DAOXIN_DEFAULT_SCHEDULES, TODAY, SCHEDULE_STORAGE_KEY } from '../value';
+import { DAOXIN_DEFAULT_SCHEDULES, getTodayString, SCHEDULE_STORAGE_KEY } from '../value';
 
 const useSchedule = () => {
   const [schedules, setSchedules] = useAtom(ScheduleList);
@@ -30,13 +32,15 @@ const useSchedule = () => {
   const { dao, updateDao } = useDaoxin();
   const { categories, addCategoryExp } = useCategory();
   const { addLog } = useActivityLog();
+  const { inventory, addSpiritStones, updateInventory } = useInventory();
 
   const initSchedules = async () => {
     const data = await loadEncryptedData<Schedule[]>(SCHEDULE_STORAGE_KEY);
     let list = data || DAOXIN_DEFAULT_SCHEDULES;
 
-    // 각 스케줄의 주기/날짜 기반 상태 갱신
-    const refreshedList = list.map(s => refreshScheduleStatus(s));
+    const today = getTodayString();
+    // 각 스케줄의 주기/날짜 기반 상태 갱신 (로컬 오늘 날짜 기준)
+    const refreshedList = list.map(s => refreshScheduleStatus(s, today));
     
     // 변경사항이 있거나 신규 데이터인 경우 저장
     await saveEncryptedData(SCHEDULE_STORAGE_KEY, refreshedList);
@@ -53,16 +57,39 @@ const useSchedule = () => {
     const next = schedules.map((s) => (s.id === id ? updated : s));
 
     // 보상 로직 분리
-    const reward = CATEGORY_REWARDS[updated.scheduleCategory];
+    const baseReward = CATEGORY_REWARDS[updated.scheduleCategory];
     let currentDao = dao;
     let earnedExp = 0;
     let earnedGauge = 0;
 
+    // 공법 및 영약 버프를 적용한 보상 계산
+    const currentCategory = categories.find((c) => c.id === updated.categoryId);
+    const calculated = calculateCultivationReward(inventory, {
+      baseExp: baseReward,
+      baseGauge: 0,
+      scheduleCategory: updated.scheduleCategory,
+      categoryId: updated.categoryId,
+      categoryName: currentCategory?.name,
+      currentDate: new Date(),
+    });
+
     // 1. 경험치(Exp): 어떤 스케줄이든 개별 항목이 완료될 때마다 즉시 반영
     if (target.scheduleCategory === 'periodic' || (!target.completed && updated.completed)) {
-      currentDao = earnExp(currentDao, reward);
-      if (updated.categoryId) addCategoryExp(updated.categoryId, reward);
-      earnedExp = reward;
+      currentDao = earnExp(currentDao, calculated.finalExp);
+      if (updated.categoryId) addCategoryExp(updated.categoryId, calculated.finalExp);
+      earnedExp = calculated.finalExp;
+
+      // 영석(Spirit Stones) 획득 및 장착 공법 숙련도 상승
+      addSpiritStones(calculated.spiritStones);
+      const { updatedTechniques } = trainEquippedTechniques(
+        inventory.ownedTechniques,
+        inventory.equippedTechniqueIds,
+        15
+      );
+      updateInventory({
+        ...inventory,
+        ownedTechniques: updatedTechniques,
+      });
     }
 
     // 2. 게이지(Gauge): 습관(habit) 카테고리의 모든 항목을 마쳤을 때만 상승
@@ -73,8 +100,11 @@ const useSchedule = () => {
       const isAllDone = nextHabits.length > 0 && nextHabits.every((h) => h.completed);
 
       if (!wasAllDone && isAllDone) {
-        currentDao = earnGauge(currentDao, reward);
-        earnedGauge = reward;
+        const finalGauge = baseReward + calculated.finalGauge;
+        currentDao = earnGauge(currentDao, finalGauge);
+        earnedGauge = finalGauge;
+        // 하루 모든 습관 완수 보너스 영석 지급
+        addSpiritStones(20);
       }
     }
 
@@ -134,8 +164,9 @@ const useSchedule = () => {
     const base = { name: newTaskName };
 
     // 카테고리에 따른 필수 데이터 초기화
+    const today = getTodayString();
     if (selectedCategory === 'habit') {
-      config = { ...base, count: 0, lastExecutedAt: TODAY };
+      config = { ...base, count: 0, lastExecutedAt: today };
     } else if (selectedCategory === 'goal') {
       config = { ...base, targetCount: goalTarget || 1, currentCount: 0, isCompleted: false };
     } else if (selectedCategory === 'interval') {
@@ -145,7 +176,7 @@ const useSchedule = () => {
       // 어제가 종료일이었다고 가정하고 오늘부터 시작되는 주기를 계산함
       const yesterday = new Date();
       yesterday.setDate(yesterday.getDate() - 1);
-      const initialRange = calculateNextPeriod(yesterday.toISOString(), type);
+      const initialRange = calculateNextPeriod(formatDate(yesterday), type);
 
       config = {
         ...base,
@@ -153,7 +184,7 @@ const useSchedule = () => {
         periodEnd: initialRange.end,
         periodCount: 0,
         totalCount: 0,
-        lastResetAt: TODAY,
+        lastResetAt: today,
       };
     }
 
@@ -161,7 +192,7 @@ const useSchedule = () => {
       id: Date.now().toString(),
       scheduleCategory: selectedCategory,
       type: type,
-      completed: selectedCategory === 'habit' ? true : false,
+      completed: false,
       categoryId: selectedUserCategoryId || undefined,
       config,
     };

@@ -1,0 +1,491 @@
+/* 만물각(상점) 모달 스타일 */
+.shop-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.78);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 16px;
+  animation: shopFadeIn 0.25s ease-out;
+}
+
+@keyframes shopFadeIn {
+  from { opacity: 0; transform: scale(0.97); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.shop-modal-container {
+  background: linear-gradient(150deg, rgba(22, 18, 28, 0.96), rgba(12, 10, 18, 0.98));
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  box-shadow: 0 16px 45px rgba(0, 0, 0, 0.7), 0 0 25px rgba(212, 175, 55, 0.12);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 540px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  color: var(--text-color, #e0e0e0);
+  position: relative;
+}
+
+/* 헤더 */
+.shop-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 24px;
+  border-bottom: 1px solid rgba(212, 175, 55, 0.15);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.shop-header-title-box {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.shop-header-icon {
+  font-size: 1.8rem;
+  filter: drop-shadow(0 2px 6px rgba(212, 175, 55, 0.4));
+}
+
+.shop-modal-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--gold-leaf, #d4af37);
+  letter-spacing: 0.05em;
+  margin: 0;
+  text-shadow: 0 0 12px rgba(212, 175, 55, 0.35);
+}
+
+.shop-modal-subtitle {
+  font-size: 0.8rem;
+  color: var(--text-dim, #a0a0a0);
+  margin: 2px 0 0 0;
+  line-height: 1.4;
+}
+
+.shop-modal-close {
+  background: transparent;
+  border: none;
+  color: var(--text-dim, #a0a0a0);
+  font-size: 1.3rem;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 50%;
+  line-height: 1;
+  transition: all 0.2s ease;
+}
+
+.shop-modal-close:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* 영석 잔액 바 */
+.shop-balance-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 24px;
+  background: rgba(0, 0, 0, 0.3);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.balance-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.balance-label {
+  font-size: 0.8rem;
+  color: var(--text-dim, #aaa);
+}
+
+.balance-amount {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(212, 175, 55, 0.12);
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  padding: 3px 12px;
+  border-radius: 20px;
+}
+
+.stone-gem {
+  font-size: 1.1rem;
+}
+
+.stone-val {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--gold-leaf, #d4af37);
+  letter-spacing: 0.05em;
+}
+
+.charge-ad-btn {
+  background: linear-gradient(135deg, rgba(78, 205, 196, 0.2), rgba(78, 205, 196, 0.08));
+  border: 1px solid rgba(78, 205, 196, 0.4);
+  color: #4ecdc4;
+  padding: 4px 10px;
+  border-radius: 16px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.charge-ad-btn:hover:not(:disabled) {
+  background: rgba(78, 205, 196, 0.3);
+  box-shadow: 0 0 10px rgba(78, 205, 196, 0.3);
+  transform: translateY(-1px);
+}
+
+.charge-ad-btn:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+
+/* 2행: 청심환 실시간 남은 지속시간 및 보심단 보유 현황 바 */
+.shop-buff-status-bar {
+  display: flex;
+  gap: 10px;
+  padding: 10px 24px;
+  background: rgba(0, 0, 0, 0.22);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.buff-status-card {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  transition: all 0.2s ease;
+}
+
+.buff-status-card.elixir.active {
+  border-color: rgba(78, 205, 196, 0.4);
+  background: linear-gradient(135deg, rgba(78, 205, 196, 0.1), rgba(78, 205, 196, 0.03));
+  box-shadow: inset 0 0 10px rgba(78, 205, 196, 0.08);
+}
+
+.buff-status-card.shield {
+  border-color: rgba(255, 170, 0, 0.25);
+  background: linear-gradient(135deg, rgba(255, 170, 0, 0.08), rgba(255, 170, 0, 0.02));
+}
+
+.buff-card-icon {
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+
+.buff-card-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow: hidden;
+}
+
+.buff-card-name {
+  font-size: 0.72rem;
+  color: var(--text-dim, #aaa);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.buff-card-detail {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.buff-highlight {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #4ecdc4;
+}
+
+.buff-time-left {
+  font-size: 0.75rem;
+  color: #a8edea;
+  font-weight: 600;
+}
+
+.buff-inactive {
+  font-size: 0.75rem;
+  color: var(--text-dim, #777);
+}
+
+.buff-count-text {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #ffaa00;
+}
+
+/* 토스트 */
+.shop-feedback-toast {
+  position: absolute;
+  top: 75px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(20, 20, 25, 0.95);
+  color: var(--gold-leaf, #d4af37);
+  border: 1px solid var(--gold-leaf, #d4af37);
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+  z-index: 10;
+  animation: toastFade 0.2s ease;
+}
+
+@keyframes toastFade {
+  from { opacity: 0; transform: translate(-50%, -10px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+/* 탭 버튼 */
+.shop-tabs {
+  display: flex;
+  padding: 12px 24px 0 24px;
+  gap: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.shop-tab-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-dim, #888);
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 8px 16px;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s;
+}
+
+.shop-tab-btn:hover {
+  color: #e0e0e0;
+}
+
+.shop-tab-btn.active {
+  color: var(--gold-leaf, #d4af37);
+}
+
+.shop-tab-btn.active::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--gold-leaf, #d4af37);
+  box-shadow: 0 0 8px rgba(212, 175, 55, 0.6);
+}
+
+/* 아이템 컨테이너 */
+.shop-items-container {
+  padding: 18px 24px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.shop-items-container::-webkit-scrollbar {
+  width: 6px;
+}
+.shop-items-container::-webkit-scrollbar-thumb {
+  background: rgba(212, 175, 55, 0.25);
+  border-radius: 3px;
+}
+
+.shop-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.shop-item-card {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 14px 16px;
+  gap: 14px;
+  transition: all 0.2s ease;
+}
+
+.shop-item-card:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(212, 175, 55, 0.25);
+}
+
+.shop-item-card.owned {
+  background: rgba(212, 175, 55, 0.03);
+  border-color: rgba(212, 175, 55, 0.2);
+}
+
+.item-icon-wrap {
+  font-size: 2rem;
+  width: 48px;
+  height: 48px;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.item-icon-wrap.elixir {
+  border-color: rgba(78, 205, 196, 0.3);
+}
+
+.item-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.item-name-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.item-name {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.item-owned-badge {
+  font-size: 0.68rem;
+  padding: 1px 6px;
+  border-radius: 6px;
+  background: rgba(78, 205, 196, 0.2);
+  color: #4ecdc4;
+  border: 1px solid rgba(78, 205, 196, 0.3);
+}
+
+.item-active-badge {
+  font-size: 0.68rem;
+  padding: 1px 6px;
+  border-radius: 6px;
+  background: rgba(255, 170, 0, 0.2);
+  color: #ffaa00;
+  border: 1px solid rgba(255, 170, 0, 0.4);
+}
+
+.item-desc {
+  font-size: 0.78rem;
+  color: var(--text-dim, #aaa);
+  margin: 0;
+  line-height: 1.35;
+}
+
+.item-action-row {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.item-price {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.price-gem {
+  font-size: 0.95rem;
+}
+
+.price-val {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--gold-leaf, #d4af37);
+}
+
+.item-btn {
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.item-btn.buy {
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.25), rgba(212, 175, 55, 0.15));
+  border: 1px solid rgba(212, 175, 55, 0.45);
+  color: var(--gold-leaf, #d4af37);
+}
+
+.item-btn.buy:hover:not(:disabled) {
+  background: var(--gold-leaf, #d4af37);
+  color: #111;
+  box-shadow: 0 0 10px rgba(212, 175, 55, 0.4);
+}
+
+.item-btn.buy:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  border-color: rgba(255, 255, 255, 0.1);
+  color: #777;
+}
+
+.item-btn.view-tech {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: var(--text-dim, #ccc);
+}
+
+.item-btn.view-tech:hover {
+  border-color: var(--gold-leaf, #d4af37);
+  color: var(--gold-leaf, #d4af37);
+}
+
+/* 푸터 */
+.shop-modal-footer {
+  padding: 12px 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(0, 0, 0, 0.25);
+  text-align: center;
+}
+
+.footer-tip {
+  font-size: 0.72rem;
+  color: var(--text-dim, #888);
+}
+
+@media (max-width: 480px) {
+  .shop-modal-header,
+  .shop-balance-bar,
+  .shop-tabs,
+  .shop-items-container,
+  .shop-modal-footer {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+  .shop-item-card {
+    padding: 12px;
+  }
+}

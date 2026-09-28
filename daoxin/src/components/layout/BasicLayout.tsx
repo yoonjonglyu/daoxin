@@ -7,6 +7,9 @@ import './basiclayout.css';
 import AdBanner from '../../providers/ads/AdBanner';
 import { useAds } from '../../providers/ads/AdsProvider';
 import ExitAdModal from '../exitmodal/ExitAdModal';
+import TechniqueModal from '../../features/technique/TechniqueModal';
+import ShopModal from '../../features/shop/ShopModal';
+import useInventory from '../../hooks/useInventory';
 import { useTranslation } from '../../utils/i18n';
 
 const isCapacitor = import.meta.env.VITE_BUILD_TARGET === 'capacitor';
@@ -20,6 +23,9 @@ export interface BasicLayoutProps {
 const BasicLayout: React.FC<BasicLayoutProps> = ({ children, onSettingsClick }) => {
   const { isAdEnabled, environment } = useAds();
   const [isExitModalOpen, setIsExitModalOpen] = useState(false);
+  const [isTechniqueModalOpen, setIsTechniqueModalOpen] = useState(false);
+  const [isShopModalOpen, setIsShopModalOpen] = useState(false);
+  const { inventory } = useInventory();
   const location = useLocation();
   const { t } = useTranslation();
 
@@ -97,8 +103,8 @@ const BasicLayout: React.FC<BasicLayoutProps> = ({ children, onSettingsClick }) 
 
   return (
     <div className="basic-layout">
-      {/* 메인 콘텐츠 영역: 하단 고정 요소들의 높이만큼 padding-bottom 적용 */}
-      <main className="layout-content" style={{ paddingBottom: `${totalFixedBottomHeight}px` }}>
+      {/* 메인 콘텐츠 영역: 상단 액션바 및 하단 고정 요소 높이만큼 padding 적용 */}
+      <main className="layout-content" style={{ paddingTop: '64px', paddingBottom: `${totalFixedBottomHeight}px` }}>
         {children}
       </main>
 
@@ -117,15 +123,46 @@ const BasicLayout: React.FC<BasicLayoutProps> = ({ children, onSettingsClick }) 
         </div>
       )}
 
-      {/* 설정 버튼 */}
-      <button
-        id="settings-trigger-btn"
-        className="settings-trigger-btn"
-        onClick={onSettingsClick}
-        aria-label="Open Settings"
-      >
-        ⚙️
-      </button>
+      {/* 상단 통합 액션 바 (영석 표시, 공법, 만물각, 설정) */}
+      <header className="top-action-bar">
+        <button 
+          className="spirit-stone-badge-btn" 
+          onClick={() => setIsShopModalOpen(true)}
+          title={t('spiritStones')}
+          aria-label={t('spiritStones')}
+        >
+          <span className="stone-gem-icon">💎</span>
+          <span className="stone-count-text">{inventory.spiritStones}</span>
+        </button>
+
+        <div className="top-action-buttons">
+          <button
+            className="top-action-icon-btn"
+            onClick={() => setIsTechniqueModalOpen(true)}
+            title={t('manageTechniques')}
+            aria-label={t('manageTechniques')}
+          >
+            📖
+          </button>
+          <button
+            className="top-action-icon-btn"
+            onClick={() => setIsShopModalOpen(true)}
+            title={t('shopTitle')}
+            aria-label={t('shopTitle')}
+          >
+            🏛️
+          </button>
+          <button
+            id="settings-trigger-btn"
+            className="top-action-icon-btn settings-trigger-btn"
+            onClick={onSettingsClick}
+            title={t('settings')}
+            aria-label="Open Settings"
+          >
+            ⚙️
+          </button>
+        </div>
+      </header>
 
       {/* 하단 네비게이션 바 */}
       <div className="bottom-navigation-container">
@@ -148,11 +185,26 @@ const BasicLayout: React.FC<BasicLayoutProps> = ({ children, onSettingsClick }) 
         </a>
       </nav>
 
+      {/* 공법 수련관 모달 */}
+      <TechniqueModal
+        isOpen={isTechniqueModalOpen}
+        onClose={() => setIsTechniqueModalOpen(false)}
+        onOpenShop={() => setIsShopModalOpen(true)}
+      />
+
+      {/* 만물각(상점) 모달 */}
+      <ShopModal
+        isOpen={isShopModalOpen}
+        onClose={() => setIsShopModalOpen(false)}
+        onOpenTechniques={() => setIsTechniqueModalOpen(true)}
+      />
+
       {/* 앱 종료 / 뒤로가기 광고 모달 */}
       <ExitAdModal 
         isOpen={isExitModalOpen} 
         onClose={() => setIsExitModalOpen(false)} 
         onConfirm={handleConfirmExit} 
+        onOpenShop={() => setIsShopModalOpen(true)}
       />
     </div>
   );

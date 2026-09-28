@@ -1,6 +1,6 @@
 import { Daoxin } from '../types/daoxin';
 import { ScheduleCategory } from '../types/schedule';
-import { MIN_GAUGE, MAX_GAUGE, TODAY } from '../value';
+import { MIN_GAUGE, MAX_GAUGE, getTodayString } from '../value';
 
 /**
  * 수련 종류별 도심(Daoxin) 보상 설정 (경험치 및 게이지 상승량)
@@ -16,10 +16,11 @@ export const CATEGORY_REWARDS: Record<ScheduleCategory, number> = {
  * 날짜 경과에 따른 도심(Daoxin) 패널티 적용 (게이지 감소)
  */
 export const applyDailyPenalty = (state: Daoxin, daysPassed: number): Daoxin => {
+  const today = getTodayString();
   if (daysPassed <= 0) return state;
 
   // 패널티 설정이 꺼져있다면 날짜만 갱신하고 게이지는 유지
-  if (state.penalty && !state.penalty.enabled) return { ...state, updateAt: TODAY };
+  if (state.penalty && !state.penalty.enabled) return { ...state, updateAt: today };
 
   const nextGauge = Math.max(MIN_GAUGE, state.gauge - daysPassed);
   const nextStreak = daysPassed > 1 ? 0 : state.streak;
@@ -28,7 +29,7 @@ export const applyDailyPenalty = (state: Daoxin, daysPassed: number): Daoxin => 
     ...state,
     gauge: nextGauge,
     streak: nextStreak,
-    updateAt: TODAY,
+    updateAt: today,
   };
 };
 
@@ -44,7 +45,7 @@ export const earnExp = (state: Daoxin, amount: number = 1): Daoxin => {
     exp: nextExp,
     level: nextLevel,
     totalCompleted: state.totalCompleted + 1,
-    updateAt: TODAY,
+    updateAt: getTodayString(),
   };
 };
 
@@ -56,6 +57,6 @@ export const earnGauge = (state: Daoxin, amount: number = 1): Daoxin => {
     ...state,
     streak: state.streak + 1,
     gauge: Math.min(MAX_GAUGE, state.gauge + amount),
-    updateAt: TODAY,
+    updateAt: getTodayString(),
   };
 };

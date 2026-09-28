@@ -6,7 +6,6 @@ import {
   getWeeklyStats, 
   getMonthlyStats 
 } from '../services/statisticsService';
-import { TODAY } from '../value';
 
 // 전체 로그를 저장하는 기본 아톰
 export const activityLogsAtom = atom<ActivityLog[]>([]);
@@ -20,7 +19,7 @@ export const totalStatsAtom = atom((get) => {
 // 오늘 날짜 기준의 통계 (파생 아톰)
 export const dailyStatsAtom = atom((get) => {
   const logs = get(activityLogsAtom);
-  return getDailyStats(logs, TODAY.replace(/\//g, '-')); // YYYY-MM-DD 형식 대응
+  return getDailyStats(logs, new Date());
 });
 
 // 이번 주 통계 (파생 아톰)

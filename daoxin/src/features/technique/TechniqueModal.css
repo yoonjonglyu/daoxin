@@ -1,0 +1,483 @@
+/* 공법 모달 백드롭 및 컨테이너 */
+.technique-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 16px;
+  animation: techniqueFadeIn 0.25s ease-out;
+}
+
+@keyframes techniqueFadeIn {
+  from { opacity: 0; transform: scale(0.97); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.technique-modal-container {
+  background: linear-gradient(145deg, rgba(20, 20, 26, 0.95), rgba(12, 12, 16, 0.98));
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6), 0 0 20px rgba(212, 175, 55, 0.1);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 540px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  color: var(--text-color, #e0e0e0);
+}
+
+/* 헤더 */
+.technique-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 1px solid rgba(212, 175, 55, 0.15);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.technique-header-title-box {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.technique-header-icon {
+  font-size: 1.8rem;
+  filter: drop-shadow(0 2px 6px rgba(212, 175, 55, 0.3));
+}
+
+.technique-modal-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--gold-leaf, #d4af37);
+  letter-spacing: 0.05em;
+  margin: 0;
+  text-shadow: 0 0 12px rgba(212, 175, 55, 0.3);
+}
+
+.technique-modal-subtitle {
+  font-size: 0.8rem;
+  color: var(--text-dim, #a0a0a0);
+  margin: 2px 0 0 0;
+  line-height: 1.4;
+}
+
+.technique-modal-close {
+  background: transparent;
+  border: none;
+  color: var(--text-dim, #a0a0a0);
+  font-size: 1.3rem;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 50%;
+  line-height: 1;
+  transition: all 0.2s ease;
+}
+
+.technique-modal-close:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* 본문 콘텐츠 */
+.technique-modal-content {
+  padding: 20px 24px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.technique-modal-content::-webkit-scrollbar {
+  width: 6px;
+}
+.technique-modal-content::-webkit-scrollbar-thumb {
+  background: rgba(212, 175, 55, 0.25);
+  border-radius: 3px;
+}
+
+/* 섹션 공통 */
+.technique-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.technique-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.technique-section-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--gold-leaf, #d4af37);
+  letter-spacing: 0.03em;
+}
+
+.goto-shop-btn {
+  background: rgba(212, 175, 55, 0.1);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  color: var(--gold-leaf, #d4af37);
+  font-size: 0.8rem;
+  padding: 4px 10px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.goto-shop-btn:hover {
+  background: rgba(212, 175, 55, 0.25);
+  box-shadow: 0 0 10px rgba(212, 175, 55, 0.2);
+}
+
+/* 장착 슬롯 그리드 */
+.equipped-slots-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.equipped-slot-card {
+  border-radius: 12px;
+  padding: 14px;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.equipped-slot-card.active {
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.08), rgba(30, 25, 20, 0.6));
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  box-shadow: inset 0 0 15px rgba(212, 175, 55, 0.05);
+}
+
+.equipped-slot-card.empty {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px dashed rgba(255, 255, 255, 0.15);
+  min-height: 120px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: var(--text-dim, #777);
+}
+
+.empty-slot-icon {
+  font-size: 1.4rem;
+  opacity: 0.6;
+}
+
+.empty-slot-text {
+  font-size: 0.85rem;
+}
+
+.slot-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.slot-badge {
+  font-size: 0.75rem;
+  font-weight: bold;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #d4af37, #aa8014);
+  color: #111;
+  letter-spacing: 0.05em;
+}
+
+.unequip-btn {
+  background: rgba(255, 70, 70, 0.15);
+  border: 1px solid rgba(255, 70, 70, 0.3);
+  color: #ff8888;
+  font-size: 0.75rem;
+  padding: 3px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.unequip-btn:hover {
+  background: rgba(255, 70, 70, 0.3);
+  color: #fff;
+}
+
+.slot-card-body {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.slot-tech-icon {
+  font-size: 1.8rem;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 8px;
+  border-radius: 10px;
+  border: 1px solid rgba(212, 175, 55, 0.2);
+}
+
+.slot-tech-info {
+  flex: 1;
+}
+
+.slot-tech-name {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.slot-tech-desc {
+  font-size: 0.75rem;
+  color: var(--text-dim, #a0a0a0);
+  margin-top: 2px;
+  line-height: 1.3;
+}
+
+.slot-mastery-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.slot-mastery-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.7rem;
+  color: var(--text-dim, #888);
+}
+
+.slot-mastery-track {
+  height: 5px;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 3px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.slot-mastery-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #d4af37, #4ecdc4);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+/* 보유 공법 리스트 */
+.owned-techniques-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.technique-item-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 12px 16px;
+  transition: all 0.2s ease;
+  gap: 12px;
+}
+
+.technique-item-card:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(212, 175, 55, 0.2);
+}
+
+.technique-item-card.is-equipped {
+  border-color: rgba(212, 175, 55, 0.4);
+  background: rgba(212, 175, 55, 0.04);
+}
+
+.tech-item-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex: 1;
+}
+
+.tech-item-icon {
+  font-size: 1.8rem;
+  width: 44px;
+  height: 44px;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  flex-shrink: 0;
+}
+
+.tech-item-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.tech-item-name-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tech-item-name {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.tech-tier-pill {
+  font-size: 0.7rem;
+  padding: 1px 6px;
+  border-radius: 8px;
+  background: rgba(212, 175, 55, 0.2);
+  color: var(--gold-leaf, #d4af37);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+}
+
+.tech-item-desc {
+  font-size: 0.78rem;
+  color: var(--text-dim, #a0a0a0);
+  margin: 0;
+  line-height: 1.3;
+}
+
+.tech-item-mastery-box {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin-top: 4px;
+  max-width: 220px;
+}
+
+.tech-mastery-text {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.68rem;
+  color: var(--text-dim, #777);
+}
+
+.tech-mastery-bar {
+  height: 4px;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.tech-mastery-progress {
+  height: 100%;
+  background: linear-gradient(90deg, #d4af37, #4ecdc4);
+  border-radius: 2px;
+}
+
+.tech-item-right {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.tech-action-btn {
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tech-action-btn.equip {
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.2), rgba(212, 175, 55, 0.1));
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  color: var(--gold-leaf, #d4af37);
+}
+
+.tech-action-btn.equip:hover:not(:disabled) {
+  background: var(--gold-leaf, #d4af37);
+  color: #111;
+  box-shadow: 0 0 12px rgba(212, 175, 55, 0.3);
+}
+
+.tech-action-btn.equip:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  border-color: rgba(255, 255, 255, 0.1);
+  color: #888;
+}
+
+.tech-action-btn.unequip {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: var(--text-dim, #aaa);
+}
+
+.tech-action-btn.unequip:hover {
+  background: rgba(255, 70, 70, 0.2);
+  border-color: rgba(255, 70, 70, 0.4);
+  color: #ff8888;
+}
+
+/* 카테고리 특화 셀렉터 */
+.tech-category-picker {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+  background: rgba(0, 0, 0, 0.35);
+  padding: 4px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  width: fit-content;
+}
+
+.picker-label {
+  font-size: 0.72rem;
+  color: var(--gold-leaf, #d4af37);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.tech-category-select {
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  outline: none;
+}
+
+.tech-category-select option {
+  background: #181820;
+  color: #fff;
+}
+
+@media (max-width: 480px) {
+  .technique-modal-content {
+    padding: 16px;
+    gap: 18px;
+  }
+  .technique-modal-header {
+    padding: 16px;
+  }
+  .equipped-slots-grid {
+    grid-template-columns: 1fr;
+  }
+  .tech-item-left {
+    gap: 10px;
+  }
+}

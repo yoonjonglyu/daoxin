@@ -1,11 +1,12 @@
 import { loadEncryptedData, saveEncryptedData } from './storage';
-import { DAOXIN, SCHEDULE_STORAGE_KEY, CATEGORY_STORAGE_KEY, LOG_STORAGE_KEY } from '../value';
+import { DAOXIN, SCHEDULE_STORAGE_KEY, CATEGORY_STORAGE_KEY, LOG_STORAGE_KEY, INVENTORY_STORAGE_KEY } from '../value';
 
 export interface DaoxinBackupData {
   daoxin: any;
   schedules: any[];
   categories: any[];
   logs: any[];
+  inventory?: any;
   version: string;
   exportedAt: string;
 }
@@ -15,13 +16,15 @@ export const exportAllData = async (): Promise<DaoxinBackupData> => {
   const schedules = await loadEncryptedData<any[]>(SCHEDULE_STORAGE_KEY);
   const categories = await loadEncryptedData<any[]>(CATEGORY_STORAGE_KEY);
   const logs = await loadEncryptedData<any[]>(LOG_STORAGE_KEY);
+  const inventory = await loadEncryptedData<any>(INVENTORY_STORAGE_KEY);
   
   return {
     daoxin,
     schedules: schedules || [],
     categories: categories || [],
     logs: logs || [],
-    version: '2.0.0',
+    inventory: inventory || null,
+    version: '2.1.0',
     exportedAt: new Date().toISOString()
   };
 };
@@ -41,6 +44,9 @@ export const importAllData = async (backup: DaoxinBackupData): Promise<boolean> 
     await saveEncryptedData(SCHEDULE_STORAGE_KEY, backup.schedules);
     await saveEncryptedData(CATEGORY_STORAGE_KEY, backup.categories);
     await saveEncryptedData(LOG_STORAGE_KEY, backup.logs || []);
+    if (backup.inventory) {
+      await saveEncryptedData(INVENTORY_STORAGE_KEY, backup.inventory);
+    }
     return true;
   } catch (err) {
     console.error('Import failed:', err);

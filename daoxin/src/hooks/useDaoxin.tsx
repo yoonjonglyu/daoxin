@@ -5,8 +5,9 @@ import type { Daoxin } from '../types/daoxin';
 
 import {
   DAOXIN,
-  TODAY,
+  getTodayString,
   DAOXIN_DEFAULT,
+  INVENTORY_STORAGE_KEY,
 } from '../value';
 import { saveEncryptedData, loadEncryptedData } from '../utils/storage';
 import { getDaysDifference } from '../utils/date';
@@ -25,10 +26,41 @@ const useDaoxin = () => {
       return;
     }
     const nextState: Daoxin = { ...DAOXIN_DEFAULT, ...storedData };
-    const daysPassed = getDaysDifference(nextState.updateAt, TODAY);
+    const today = getTodayString();
+    const daysPassed = getDaysDifference(nextState.updateAt, today);
     
     if (daysPassed > 0) {
-      const updatedState = applyDailyPenalty(nextState, daysPassed);
+      let updatedState = applyDailyPenalty(nextState, daysPassed);
+
+      // 스트릭이 끊길 상황(daysPassed > 1)인 경우 방어 아이템 및 공법 확인
+      if (daysPassed > 1 && nextState.streak > 0) {
+        const inv = await loadEncryptedData<any>(INVENTORY_STORAGE_KEY);
+        if (inv) {
+          const hasImmortalMind = inv.equippedTechniqueIds?.includes('tech-immortal-mind');
+          const hasStreakShield = (inv.consumables?.streakShields || 0) > 0;
+
+          if (hasImmortalMind || hasStreakShield) {
+            // 스트릭 보존!
+            updatedState = {
+              ...updatedState,
+              streak: nextState.streak,
+            };
+
+            // 보심단 우선 소모 (불멸심인은 패시브)
+            if (hasStreakShield) {
+              const updatedInv = {
+                ...inv,
+                consumables: {
+                  ...inv.consumables,
+                  streakShields: inv.consumables.streakShields - 1,
+                },
+              };
+              await saveEncryptedData(INVENTORY_STORAGE_KEY, updatedInv);
+            }
+          }
+        }
+      }
+
       await saveEncryptedData(DAOXIN, updatedState);
       setDao(updatedState);
       return;

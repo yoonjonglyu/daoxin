@@ -483,15 +483,15 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
                   <span className='app-info-row-label'>
                     {config.language === 'en' ? 'Version' : '버전'}
                   </span>
-                  <span className='app-info-row-value'>v2.0.0</span>
+                  <span className='app-info-row-value'>v2.1.0</span>
                 </div>
                 <div className='app-info-row'>
                   <span className='app-info-row-label'>
                     {config.language === 'en' ? 'Developer' : '개발자'}
                   </span>
                   <span className='app-info-row-value'>
-                    <a href='mailto:yunjonglyu@gmail.com'>
-                      yunjonglyu@gmail.com
+                    <a href='mailto:content@ryuislabs.com'>
+                      content@ryuislabs.com
                     </a>
                   </span>
                 </div>

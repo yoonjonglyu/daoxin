@@ -39,7 +39,7 @@ const MainPage: FC = () => {
           />
         </div>
         <p className='status-stats'>
-          {t('accumulatedQi')} {dao.exp} · {dao.streak}{t('dayStreak')}
+          {t('accumulatedQi')} {dao.exp} · {dao.streak} {t('dayStreak')}
         </p>
       </section>
 

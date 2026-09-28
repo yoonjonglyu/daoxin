@@ -72,6 +72,7 @@
 
 .schedule-container .config-field {
   flex: 1;
+  min-width: 0;
 }
 
 .schedule-container .config-field label {

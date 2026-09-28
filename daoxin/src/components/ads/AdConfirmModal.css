@@ -1,0 +1,131 @@
+/* 광고 시청 확인 모달 */
+.ad-confirm-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 12000; /* ExitAdModal(11000)보다 높게 설정 */
+  padding: 16px;
+  animation: adConfirmFade 0.2s ease-out;
+}
+
+@keyframes adConfirmFade {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.ad-confirm-card {
+  background: linear-gradient(145deg, #181820, #0f0f14);
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.8), 0 0 25px rgba(212, 175, 55, 0.15);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 380px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 14px;
+}
+
+.ad-confirm-icon-wrap {
+  width: 52px;
+  height: 52px;
+  background: rgba(212, 175, 55, 0.12);
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2px;
+}
+
+.ad-confirm-icon {
+  font-size: 1.6rem;
+  filter: drop-shadow(0 2px 6px rgba(212, 175, 55, 0.4));
+}
+
+.ad-confirm-title {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--gold-leaf, #d4af37);
+  letter-spacing: 0.03em;
+}
+
+.ad-confirm-desc {
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: var(--text-dim, #ccc);
+}
+
+.ad-confirm-reward-box {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 8px 14px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.82rem;
+  width: 100%;
+  box-sizing: border-box;
+  justify-content: center;
+}
+
+.reward-box-label {
+  color: var(--text-dim, #888);
+}
+
+.reward-box-value {
+  color: #4ecdc4;
+  font-weight: 700;
+}
+
+.ad-confirm-actions {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+  margin-top: 6px;
+}
+
+.ad-confirm-btn {
+  flex: 1;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.ad-confirm-btn.cancel {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: var(--text-dim, #aaa);
+}
+
+.ad-confirm-btn.cancel:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+}
+
+.ad-confirm-btn.confirm {
+  background: linear-gradient(135deg, var(--gold-leaf, #d4af37), #aa8014);
+  border: 1px solid rgba(212, 175, 55, 0.6);
+  color: #111;
+  font-weight: 700;
+  box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+}
+
+.ad-confirm-btn.confirm:hover {
+  background: #e6c34e;
+  box-shadow: 0 4px 20px rgba(212, 175, 55, 0.5);
+  transform: translateY(-1px);
+}

@@ -1,18 +1,19 @@
 import { Schedule, GoalConfig, IntervalConfig, PeriodicConfig, HabitConfig } from '../types/schedule';
-import { TODAY } from '../value';
+import { getTodayString } from '../value';
 import { getDaysDifference, calculateNextPeriod } from '../utils/date';
 
 /**
  * 날짜 경과 및 주기에 따른 스케줄 상태 갱신 (초기화 로직)
  */
-export const refreshScheduleStatus = (schedule: Schedule): Schedule => {
+export const refreshScheduleStatus = (schedule: Schedule, todayStr?: string): Schedule => {
+  const today = todayStr || getTodayString();
   const { scheduleCategory, config, completed } = schedule;
 
   switch (scheduleCategory) {
     case 'habit': {
       const habitConfig = config as HabitConfig;
       // 마지막 완료일이 오늘이 아니라면 완료 상태 초기화
-      if (completed && habitConfig.lastExecutedAt !== TODAY) {
+      if (completed && habitConfig.lastExecutedAt !== today) {
         return { ...schedule, completed: false };
       }
       break;
@@ -22,7 +23,7 @@ export const refreshScheduleStatus = (schedule: Schedule): Schedule => {
       const intervalConfig = config as IntervalConfig;
       // 설정된 간격(days)이 지났다면 다시 수행 가능하도록 초기화
       if (completed && intervalConfig.lastExecutedAt) {
-        const daysPassed = getDaysDifference(intervalConfig.lastExecutedAt, TODAY);
+        const daysPassed = getDaysDifference(intervalConfig.lastExecutedAt, today);
         if (daysPassed >= intervalConfig.intervalDays) {
           return { ...schedule, completed: false };
         }
@@ -35,11 +36,11 @@ export const refreshScheduleStatus = (schedule: Schedule): Schedule => {
       const type = schedule.type;
 
       // 주기 종료일이 지났다면 통계 초기화 및 주기 갱신
-      if (periodicConfig.periodEnd && TODAY > periodicConfig.periodEnd) {
+      if (periodicConfig.periodEnd && today > periodicConfig.periodEnd) {
         let nextRange = calculateNextPeriod(periodicConfig.periodEnd, type);
         
         // 사용자가 아주 오랜만에 접속했을 경우를 대비해 현재 날짜가 포함된 주기까지 밀어줌
-        while (TODAY > nextRange.end) {
+        while (today > nextRange.end) {
           nextRange = calculateNextPeriod(nextRange.end, type);
         }
 
@@ -51,7 +52,7 @@ export const refreshScheduleStatus = (schedule: Schedule): Schedule => {
             periodCount: 0,
             periodStart: nextRange.start,
             periodEnd: nextRange.end,
-            lastResetAt: TODAY,
+            lastResetAt: today,
           },
         };
       }
@@ -65,7 +66,8 @@ export const refreshScheduleStatus = (schedule: Schedule): Schedule => {
 /**
  * 스케줄 카테고리에 따른 완료/진행 상태 계산
  */
-export const calculateScheduleCompletion = (schedule: Schedule): Schedule => {
+export const calculateScheduleCompletion = (schedule: Schedule, todayStr?: string): Schedule => {
+  const today = todayStr || getTodayString();
   switch (schedule.scheduleCategory) {
     case 'habit':
       // 습관형: 한 번 완료하면 체크 해제 불가
@@ -73,7 +75,7 @@ export const calculateScheduleCompletion = (schedule: Schedule): Schedule => {
       return { 
         ...schedule, 
         completed: true, 
-        config: { ...schedule.config, lastExecutedAt: TODAY } as HabitConfig 
+        config: { ...schedule.config, lastExecutedAt: today } as HabitConfig 
       };
 
     case 'goal': {
@@ -101,7 +103,7 @@ export const calculateScheduleCompletion = (schedule: Schedule): Schedule => {
         config: { 
           ...config, 
           totalCount: config.totalCount + 1,
-          lastExecutedAt: TODAY 
+          lastExecutedAt: today 
         } as IntervalConfig,
       };
     }
