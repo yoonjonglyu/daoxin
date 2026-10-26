@@ -26,20 +26,22 @@
 }
 
 .breakthrough-text {
-  font-size: 1.5rem;
+  font-size: clamp(1.1rem, 3.8vw, 1.5rem);
   color: var(--gold-leaf);
   margin-top: 20px;
-  letter-spacing: 0.5em;
+  letter-spacing: 0.3em;
   text-shadow: 0 0 10px rgba(212, 175, 55, 0.8);
   animation: text-appear 2s 0.5s both;
+  text-align: center;
 }
 
 .new-rank-text {
-  font-size: 2.5rem;
+  font-size: clamp(1.8rem, 6vw, 2.5rem);
   font-weight: 900;
   color: white;
   text-shadow: 0 0 15px var(--gold-leaf);
   animation: text-appear 2s 0.8s both;
+  text-align: center;
 }
 
 @keyframes overlay-fade {

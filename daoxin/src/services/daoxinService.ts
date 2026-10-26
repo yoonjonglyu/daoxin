@@ -3,7 +3,7 @@ import { ScheduleCategory } from '../types/schedule';
 import { MIN_GAUGE, MAX_GAUGE, getTodayString } from '../value';
 
 /**
- * 수련 종류별 도심(Daoxin) 보상 설정 (경험치 및 게이지 상승량)
+ * 수련 종류별 기본 공력(Exp) 보상 설정
  */
 export const CATEGORY_REWARDS: Record<ScheduleCategory, number> = {
   habit: 2,
@@ -22,7 +22,9 @@ export const applyDailyPenalty = (state: Daoxin, daysPassed: number): Daoxin => 
   // 패널티 설정이 꺼져있다면 날짜만 갱신하고 게이지는 유지
   if (state.penalty && !state.penalty.enabled) return { ...state, updateAt: today };
 
-  const nextGauge = Math.max(MIN_GAUGE, state.gauge - daysPassed);
+  // 수행을 온전히 건너뛴 결석 일수 (어제 수련 후 오늘 접속 시 daysPassed=1 이므로 결석 0일, 하루 건너뛰면 1일)
+  const missedDays = Math.max(0, daysPassed - 1);
+  const nextGauge = Math.max(MIN_GAUGE, state.gauge - missedDays);
   const nextStreak = daysPassed > 1 ? 0 : state.streak;
 
   return {

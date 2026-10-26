@@ -113,6 +113,16 @@
   transition: all 0.3s ease;
   color: #3e2723; /* 먹색에 가까운 진한 갈색 글씨 */
   font-weight: 600;
+  box-sizing: border-box;
+}
+
+.item-card > span:first-child {
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+  word-break: break-word;
+  padding-right: 12px;
+  line-height: 1.35;
 }
 
 /* 족자 좌우 끝부분 장식 */
@@ -151,6 +161,12 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
+  flex-shrink: 0;
+  white-space: nowrap;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .complete-btn:hover {
@@ -260,6 +276,15 @@
   flex-direction: column;
   align-items: flex-start;
   gap: 2px;
+  flex: 1;
+  min-width: 0;
+  padding-right: 12px;
+}
+
+.item-name {
+  word-break: break-word;
+  text-align: left;
+  line-height: 1.35;
 }
 
 .item-desc {
@@ -267,6 +292,7 @@
   color: #5d4037; /* 나무색/먹색 계열 */
   opacity: 0.8;
   font-weight: 500;
+  word-break: break-word;
 }
 
 /* 수행 비급 관리 (SchedulePage) 테마 스타일 */

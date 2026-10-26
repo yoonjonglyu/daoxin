@@ -66,7 +66,7 @@ const useSchedule = () => {
     const currentCategory = categories.find((c) => c.id === updated.categoryId);
     const calculated = calculateCultivationReward(inventory, {
       baseExp: baseReward,
-      baseGauge: 0,
+      baseGauge: 1, // 도심 게이지 기본 상승량은 1
       scheduleCategory: updated.scheduleCategory,
       categoryId: updated.categoryId,
       categoryName: currentCategory?.name,
@@ -92,7 +92,7 @@ const useSchedule = () => {
       });
     }
 
-    // 2. 게이지(Gauge): 습관(habit) 카테고리의 모든 항목을 마쳤을 때만 상승
+    // 2. 게이지(Gauge): 습관(habit) 카테고리의 모든 항목을 마쳤을 때만 상승 (기본 1씩 상승)
     if (updated.scheduleCategory === 'habit') {
       const prevHabits = schedules.filter((s) => s.scheduleCategory === 'habit');
       const nextHabits = next.filter((s) => s.scheduleCategory === 'habit');
@@ -100,7 +100,7 @@ const useSchedule = () => {
       const isAllDone = nextHabits.length > 0 && nextHabits.every((h) => h.completed);
 
       if (!wasAllDone && isAllDone) {
-        const finalGauge = baseReward + calculated.finalGauge;
+        const finalGauge = calculated.finalGauge; // 기본 1 (+ 게이지 특화 공법 장착 시 보너스)
         currentDao = earnGauge(currentDao, finalGauge);
         earnedGauge = finalGauge;
         // 하루 모든 습관 완수 보너스 영석 지급

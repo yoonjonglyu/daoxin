@@ -8,6 +8,7 @@ import { GoogleSignIn } from '@capawesome/capacitor-google-sign-in';
 
 import useConfig from '../../hooks/useConfig';
 import { useTranslation } from '../../utils/i18n';
+import { useAds } from '../../providers/ads/AdsProvider';
 import {
   exportAllData,
   importAllData,
@@ -34,6 +35,7 @@ const SCOPES = 'https://www.googleapis.com/auth/drive.file';
 const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
   const { config, updateConfig } = useConfig();
   const { t } = useTranslation();
+  const { environment, showPrivacyConsentForm } = useAds();
 
   const [toast, setToast] = useState<{
     message: string;
@@ -60,6 +62,15 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
   ) => {
     setToast({ message, type });
     setTimeout(() => setToast(null), 3000);
+  };
+
+  const handleManageConsent = async () => {
+    const success = await showPrivacyConsentForm();
+    if (success) {
+      showToast(t('adConsentSuccess'));
+    } else {
+      showToast(t('adConsentNotAvailable'), 'error');
+    }
   };
 
   // ─── Language ───────────────────────────────────────────
@@ -518,6 +529,15 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
                 {t('privacyPolicy')}
               </div>
               <p className='privacy-text'>{t('privacyText')}</p>
+              {(environment === 'android' || environment === 'ios') && (
+                <button
+                  type='button'
+                  className='privacy-consent-btn'
+                  onClick={handleManageConsent}>
+                  <span>🛡️</span>
+                  {t('manageAdConsent')}
+                </button>
+              )}
             </div>
           </div>
         </div>

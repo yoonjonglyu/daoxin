@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useLocation } from "react-router";
+import { Link, useLocation } from "react-router";
 import { Capacitor, PluginListenerHandle } from '@capacitor/core';
 
 import './basiclayout.css';
@@ -11,9 +11,6 @@ import TechniqueModal from '../../features/technique/TechniqueModal';
 import ShopModal from '../../features/shop/ShopModal';
 import useInventory from '../../hooks/useInventory';
 import { useTranslation } from '../../utils/i18n';
-
-const isCapacitor = import.meta.env.VITE_BUILD_TARGET === 'capacitor';
-const routerBasename = isCapacitor ? '/' : '/daoxin/';
 
 export interface BasicLayoutProps {
   children?: React.ReactNode;
@@ -33,13 +30,13 @@ const BasicLayout: React.FC<BasicLayoutProps> = ({ children, onSettingsClick }) 
   const isApp = environment === 'ios' || environment === 'android';
 
   // 하단 네비게이션 바와 광고 배너의 높이를 정의
-  const navigationBarHeight = 70; // CSS에 정의된 높이 (basiclayout.css 기준)
+  const navigationBarHeight = 64; // 모바일 최적화 높이
   const adBannerHeight = 50; // AdMob/AdSense 표준 배너 높이
   
   // 광고 활성화 여부에 따라 콘텐츠 하단 여백 계산
   const totalFixedBottomHeight = isAdEnabled ? navigationBarHeight + adBannerHeight : navigationBarHeight;
 
-  // 앱 환경에서는 AdMob이 오버레이로 뜨므로 네비게이션 바의 bottom 위치를 조정해야 함
+  // 앱 환경에서는 AdMob이 바닥 오버레이(50px)로 뜨므로 네비게이션 바를 배너 위로 올림
   const navBottomOffset = (isAdEnabled && isApp) ? adBannerHeight : 0;
 
   // 1. 웹 환경 뒤로가기(popstate) 방지 및 모달 제어
@@ -103,27 +100,38 @@ const BasicLayout: React.FC<BasicLayoutProps> = ({ children, onSettingsClick }) 
 
   return (
     <div className="basic-layout">
-      {/* 메인 콘텐츠 영역: 상단 액션바 및 하단 고정 요소 높이만큼 padding 적용 */}
-      <main className="layout-content" style={{ paddingTop: '64px', paddingBottom: `${totalFixedBottomHeight}px` }}>
+      {/* 메인 콘텐츠 영역: 노치/상단바 및 하단 네비게이션/광고 배너 영역 자동 보정 */}
+      <main 
+        className="layout-content" 
+        style={{ 
+          paddingTop: 'calc(68px + env(safe-area-inset-top, 0px))', 
+          paddingBottom: isApp
+            ? `calc(${totalFixedBottomHeight}px + 12px)`
+            : `calc(${totalFixedBottomHeight}px + env(safe-area-inset-bottom, 0px) + 12px)` 
+        }}
+      >
         {children}
       </main>
 
-      {/* 하단 고정 배너 광고 */}
-      {(isAdEnabled && isApp) && (
+      {/* 하단 배너 광고 컨테이너 (앱: 바닥 50px 오버레이 영역, 웹: 하단바 위) */}
+      {isAdEnabled && (
         <div className="fixed-bottom-ad-container" style={{
           position: 'fixed',
-          bottom: isApp ? 0 : `${navigationBarHeight}px`, // 앱은 바닥에(오버레이), 웹은 네비 위에
-          left: 0, width: '100%', height: `${adBannerHeight}px`,
-          zIndex: isApp ? 10001 : 9998, // 앱에서는 AdMob 오버레이 영역 확보를 위해 높게 설정
-          display: 'flex', justifyContent: 'center', alignItems: 'center',
-          backgroundColor: '#5a5959', // 배경색 추가 (선택 사항)
-          boxShadow: '0 -2px 5px rgba(0,0,0,0.1)', // 그림자 효과 (선택 사항)
+          bottom: isApp ? 0 : `calc(${navigationBarHeight}px + env(safe-area-inset-bottom, 0px))`,
+          left: 0,
+          width: '100%',
+          height: `${adBannerHeight}px`,
+          zIndex: isApp ? 10001 : 999,
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          backgroundColor: 'var(--ink-black, #0c0c0e)',
         }}>
           <AdBanner />
         </div>
       )}
 
-      {/* 상단 통합 액션 바 (영석 표시, 공법, 만물각, 설정) */}
+      {/* 상단 통합 액션 바 (노치 및 상태표시줄 safe-area-inset 자동 대응) */}
       <header className="top-action-bar">
         <button 
           className="spirit-stone-badge-btn" 
@@ -164,25 +172,36 @@ const BasicLayout: React.FC<BasicLayoutProps> = ({ children, onSettingsClick }) 
         </div>
       </header>
 
-      {/* 하단 네비게이션 바 */}
-      <div className="bottom-navigation-container">
-      </div>
+      {/* 하단 네비게이션 바 (SPA Router Link 사용으로 깜빡임 없는 고속 탭 전환) */}
       <nav 
         className="bottom-navigation" 
-        style={{ bottom: `${navBottomOffset}px` }}
+        style={{ 
+          bottom: `${navBottomOffset}px`,
+          paddingBottom: isApp ? '0px' : 'env(safe-area-inset-bottom, 0px)',
+          height: isApp ? `${navigationBarHeight}px` : `calc(${navigationBarHeight}px + env(safe-area-inset-bottom, 0px))`
+        }}
       >
-        <a href={routerBasename} className="nav-item">
+        <Link 
+          to="/" 
+          className={`nav-item ${location.pathname === '/' ? 'active' : ''}`}
+        >
           <span className="nav-icon">☯️</span>
           <span className="nav-label">{t('practice')}</span>
-        </a>
-        <a href={`${routerBasename}category`} className="nav-item">
+        </Link>
+        <Link 
+          to="/category" 
+          className={`nav-item ${location.pathname === '/category' ? 'active' : ''}`}
+        >
           <span className="nav-icon">📜</span>
           <span className="nav-label">{t('realm')}</span>
-        </a>
-        <a href={`${routerBasename}schedule`} className="nav-item">
+        </Link>
+        <Link 
+          to="/schedule" 
+          className={`nav-item ${location.pathname === '/schedule' ? 'active' : ''}`}
+        >
           <span className="nav-icon">⚔️</span>
           <span className="nav-label">{t('manual')}</span>
-        </a>
+        </Link>
       </nav>
 
       {/* 공법 수련관 모달 */}

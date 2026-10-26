@@ -25,12 +25,15 @@
 html {
   background-color: #0c0c0e;
   color-scheme: dark;
+  overscroll-behavior-y: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 a {
   font-weight: 500;
   color: var(--gold-leaf);
   text-decoration: inherit;
+  -webkit-tap-highlight-color: transparent;
 }
 a:hover {
   color: #f3dfa2;
@@ -43,6 +46,10 @@ body {
   min-height: 100dvh;
   background-color: #0c0c0e;
   color-scheme: dark;
+  overscroll-behavior-y: none;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   /* 수묵화의 번짐과 안개를 형상화한 배경 (모바일 호환성을 위해 attachment: fixed 대신 배경색 및 그라데이션 적용) */
   background-image: 
     radial-gradient(circle at 50% -10%, rgba(45, 90, 39, 0.15) 0%, transparent 45%),
@@ -89,4 +96,11 @@ button:hover {
 button:focus,
 button:focus-visible {
   outline: 2px auto var(--jade-green);
+}
+
+/* 모바일 포커스 시 자동 확대(Auto-zoom) 방지 */
+input, select, textarea {
+  font-size: 16px;
+  font-family: inherit;
+  -webkit-tap-highlight-color: transparent;
 }

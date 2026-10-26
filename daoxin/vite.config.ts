@@ -20,15 +20,18 @@ export default defineConfig({
         start_url: base, // 동적 경로 적용
         display: 'standalone',
         description: 'Daoxin - A simple and elegant habit app',
+        theme_color: '#0c0c0e',
+        background_color: '#0c0c0e',
         icons: [
           {
-            // 경로를 `${base}favicon.ico` 형태로 바꾸면 더 안전합니다.
             src: `${base}favicon.ico`, 
             sizes: '64x64 32x32 24x24 16x16',
             type: 'image/x-icon',
           },
+          { src: `${base}pwa-64x64.png`, type: 'image/png', sizes: '64x64' },
           { src: `${base}pwa-192x192.png`, type: 'image/png', sizes: '192x192' },
           { src: `${base}pwa-512x512.png`, type: 'image/png', sizes: '512x512' },
+          { src: `${base}maskable-icon-512x512.png`, type: 'image/png', sizes: '512x512', purpose: 'maskable' },
         ],
       },
     }),

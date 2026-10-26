@@ -10,6 +10,7 @@
     "lint": "eslint .",
     "pwa:assets": "pwa-assets-generator",
     "preview": "vite preview",
+    "test": "vitest run",
     "predeploy": "pnpm build",
     "deploy": "gh-pages -d dist",
     "build:android": "cross-env VITE_BUILD_TARGET=capacitor vite build && pnpm cap sync android"
@@ -47,7 +48,8 @@
     "typescript": "~5.7.2",
     "typescript-eslint": "^8.22.0",
     "vite": "^6.1.0",
-    "vite-plugin-pwa": "^1.0.3"
+    "vite-plugin-pwa": "^1.0.3",
+    "vitest": "^5.0.5"
   },
   "pnpm": {
     "overrides": {

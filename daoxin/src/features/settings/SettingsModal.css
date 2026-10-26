@@ -507,6 +507,38 @@
   100% { opacity: 0; }
 }
 
+.privacy-text {
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.privacy-consent-btn {
+  margin-top: 12px;
+  width: 100%;
+  padding: 10px 14px;
+  background: rgba(212, 175, 55, 0.08);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  border-radius: 8px;
+  color: var(--gold-leaf);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.privacy-consent-btn:hover {
+  background: rgba(212, 175, 55, 0.16);
+  border-color: var(--gold-leaf);
+  box-shadow: 0 0 12px rgba(212, 175, 55, 0.2);
+}
+
 @media (max-width: 400px) {
   .settings-overlay {
     padding: 12px;

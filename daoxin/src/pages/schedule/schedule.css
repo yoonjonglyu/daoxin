@@ -1,8 +1,7 @@
 .schedule-container {
-  padding: 16px;
-  padding-bottom: 80px;
+  padding: 4px 0 20px 0;
   background-color: transparent; /* 전역 배경 사용 */
-  min-height: 100vh;
+  width: 100%;
   color: var(--text-main);
   box-sizing: border-box;
   text-align: left;
@@ -241,14 +240,16 @@
 }
 
 .schedule-container .task-title-input {
-  width:100%;
+  width: 100%;
   flex: 1;
+  min-width: 0;
   background: transparent;
   border: none;
   color: #3e2723;
   font-size: 16px;
   font-weight: 700;
   outline: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .schedule-container .task-title-input.completed {
@@ -263,9 +264,13 @@
   font-weight: bold;
   transition: all 0.2s;
   color: var(--cinnabar-red);
+  padding: 6px;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.schedule-container .delete-icon:hover {
+.schedule-container .delete-icon:hover,
+.schedule-container .delete-icon:active {
   opacity: 1;
-  transform: scale(1.2);
+  transform: scale(1.15);
 }
